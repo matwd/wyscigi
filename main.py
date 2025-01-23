@@ -74,23 +74,31 @@ class Car:
         self.recalculate_hitbox()
         angle = self.direction / 16 * math.tau
 
-
-        for p in self.points[0:1]:
+        for p in self.points:
             if not map.is_point_on_track(p):
                 print(p, self.position, self.velocity)
-                self.velocity += (self.position - p).normalize()
+                self.velocity += (self.position - p).normalize() * 0.3
+                self.position += old_position
+                self.position /= 2
+                self.position += (self.position - p) / 10
 
         if True:
             point1_outside = not map.is_point_on_track(self.points[0])
             point2_outside = not map.is_point_on_track(self.points[1])
+            point3_outside = not map.is_point_on_track(self.points[2])
+            point4_outside = not map.is_point_on_track(self.points[3])
 
             if point1_outside:
-                self.turn_left(360/16)
-                self.reduce_speed(0.30)
+                self.turn_left(360/64)
 
             if point2_outside:
-                self.turn_right(360/16)
-                self.reduce_speed(0.30)
+                self.turn_right(360/64)
+
+            if point3_outside:
+                self.turn_right(360/64)
+
+            if point4_outside:
+                self.turn_left(360/64)
 
 
         if not map.is_point_on_track(car.position):
@@ -102,9 +110,10 @@ class Car:
         rect = self.screen.get_rect()
         image_rect = pygame.Rect(self.x-self.rect.width//2, self.y-self.rect.width//2+random.randint(-1, 1), 128, 128)
         self.screen.blit(self.sprites[self.direction], image_rect)
+        return
         pygame.draw.circle(self.screen, pygame.Color('red'), (self.x, self.y), 3)
 
-        for p in self.points[0:1]:
+        for p in self.points:
             pygame.draw.circle(self.screen, pygame.Color('red'), tuple(p), 3)
 
     def turn_left(self, degrees):

@@ -2,14 +2,10 @@ import pygame
 import random
 import math
 from vector import Vector
+from car import Car
 
 
-pygame.init()
-screen = pygame.display.set_mode([800, 500])
-
-sprites = [pygame.image.load(f"car-sprites/{i:>04}.png").convert_alpha() for i in range(1, 17)]
-clock = pygame.time.Clock()
-
+# Wszystkie obroty są w radianach
 class Map:
     def __init__(self, screen, image_filename, hitbox_filename):
         self.screen = screen
@@ -34,154 +30,56 @@ class Map:
         self.screen.blit(self.image, image_rect)
 
 
-class Car:
-    def __init__(self, screen, sprites, poslizg, tarcie):
-        self.screen = screen
-        self.sprites = sprites
-        self.position = Vector()
-        self.velocity = Vector()
-        self.rotation = 0
-        self.direction = 0
-        self.driving = False
-        self.rect = self.sprites[0].get_rect()
-        self.poslizg = poslizg
-        self.tarcie = tarcie
-        self.recalculate_hitbox()
+class Game:
+    def __init__(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode([800, 500])
 
-    @property
-    def x(self):
-        return self.position.x
+        self.sprites = [pygame.image.load(f"car-sprites/{i:>04}.png").convert_alpha() for i in range(1, 17)]
+        self.clock = pygame.time.Clock()
 
-    @x.setter
-    def x(self, value):
-        self.position.x = value
-        self.recalculate_hitbox()
+        self.map = Map(self.screen, "map-image.png", "map-hitbox.png")
+        self.init_cars()
 
-    @property
-    def y(self):
-        return self.position.y
+    def init_cars(self):
+        self.car = Car(self.screen, self.sprites, 0.8, 0.97)
+        self.car.map = self.map
+        self.car.x = 130
+        self.car.y = 130
 
-    @y.setter
-    def y(self, value):
-        self.position.y = value
-        self.recalculate_hitbox()
+    def run(self):
+        self.running = True
+        while self.running:
+            self.mainloop()
+        pygame.quit()
 
-    def update(self):
-        self.reduce_speed(self.tarcie)
+    def mainloop(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            self.car.turn_left()
+        if keys[pygame.K_RIGHT]:
+            self.car.turn_right()
+        if keys[pygame.K_UP]:
+            self.car.accelerate(0.15)
+        if keys[pygame.K_DOWN]:
+            self.car.accelerate(-0.15)
 
-        old_position = car.position
-        self.position += self.velocity
-        self.recalculate_hitbox()
-        angle = self.direction / 16 * math.tau
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    self.running = False
+            if event.type == pygame.QUIT:
+                self.running = False
 
-        for p in self.points:
-            if not map.is_point_on_track(p):
-                print(p, self.position, self.velocity)
-                self.velocity += (self.position - p).normalize() * 0.3
-                self.position += old_position
-                self.position /= 2
-                self.position += (self.position - p) / 10
+        self.car.update()
+        self.map.draw_track()
+        self.car.draw()
+        self.map.draw_background()
 
-        if True:
-            point1_outside = not map.is_point_on_track(self.points[0])
-            point2_outside = not map.is_point_on_track(self.points[1])
-            point3_outside = not map.is_point_on_track(self.points[2])
-            point4_outside = not map.is_point_on_track(self.points[3])
+        pygame.display.flip()
+        self.clock.tick(60)
 
-            if point1_outside:
-                self.turn_left(360/64)
+if __name__ == '__main__':
+    game = Game()
+    game.run()
 
-            if point2_outside:
-                self.turn_right(360/64)
-
-            if point3_outside:
-                self.turn_right(360/64)
-
-            if point4_outside:
-                self.turn_left(360/64)
-
-
-        if not map.is_point_on_track(car.position):
-            car.position = old_position
-
-        self.recalculate_hitbox()
-
-    def draw(self):
-        rect = self.screen.get_rect()
-        image_rect = pygame.Rect(self.x-self.rect.width//2, self.y-self.rect.width//2+random.randint(-1, 1), 128, 128)
-        self.screen.blit(self.sprites[self.direction], image_rect)
-        return
-        pygame.draw.circle(self.screen, pygame.Color('red'), (self.x, self.y), 3)
-
-        for p in self.points:
-            pygame.draw.circle(self.screen, pygame.Color('red'), tuple(p), 3)
-
-    def turn_left(self, degrees):
-        # cały obrót zajmuje 2 sekundy
-        self.rotation -= degrees
-        self.update_direction()
-
-    def turn_right(self, degrees):
-        self.rotation += degrees
-        self.update_direction()
-
-    def reduce_speed(self, rate):
-        self.velocity *= rate
-
-    def accelerate(self, speed):
-        self.velocity.x += speed * math.cos(self.direction / 16 * math.tau)
-        self.velocity.y += speed * math.sin(self.direction / 16 * math.tau)
-
-    def update_direction(self):
-        degrees = self.rotation
-        degrees += 11.25
-        self.direction = math.floor((degrees % 360.0) / 360 * 16)
-
-    def recalculate_hitbox(self):
-        forward = self.direction / 16 * math.tau
-        point1_rotation = forward + math.pi / 5
-        point2_rotation = forward - math.pi / 5
-        point3_rotation = forward + math.pi - math.pi / 5
-        point4_rotation = forward + math.pi + math.pi / 5
-        point1 = self.position + Vector(25 * math.cos(point1_rotation), 15 * math.sin(point1_rotation))
-        point2 = self.position + Vector(25 * math.cos(point2_rotation), 15 * math.sin(point2_rotation))
-        point3 = self.position + Vector(25 * math.cos(point3_rotation), 15 * math.sin(point3_rotation))
-        point4 = self.position + Vector(25 * math.cos(point4_rotation), 15 * math.sin(point4_rotation))
-        self.points = [point1, point2, point3, point4]
-
-car = Car(screen, sprites, 0.8, 0.97)
-map = Map(screen, "map-image.png", "map-hitbox.png")
-car.x = 130
-car.y = 130
-
-running = True
-while running:
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
-        car.turn_left(3)
-    if keys[pygame.K_RIGHT]:
-        car.turn_right(3)
-    if keys[pygame.K_UP]:
-        car.accelerate(0.2)
-    if keys[pygame.K_DOWN]:
-        car.accelerate(-0.2)
-
-    for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_q:
-                running = False
-        if event.type == pygame.QUIT:
-            running = False
-
-    car.update()
-
-    map.draw_track()
-    car.draw()
-    map.draw_background()
-
-    pygame.display.flip()
-
-    clock.tick(60)
-
-
-pygame.quit()

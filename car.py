@@ -42,7 +42,6 @@ class Car:
         old_position = self.position
         self.position += self.velocity
         self.recalculate_hitbox()
-        angle = self.direction / 16 * math.tau
 
         for p in self.points:
             if not self.map.is_point_on_track(p):
@@ -56,7 +55,8 @@ class Car:
         point3_outside = not self.map.is_point_on_track(self.points[2])
         point4_outside = not self.map.is_point_on_track(self.points[3])
 
-        if self.direction_vector.scalar_product(self.velocity) > 0: #self.direction.
+
+        if self.direction_vector.scalar_product(self.velocity) > 0:
             if point1_outside:
                 self.turn_left()
 
@@ -88,14 +88,14 @@ class Car:
 
     def turn_left(self):
         if self.rotation_cooldown <= 0:
-            self.rotation_cooldown = 5
+            self.rotation_cooldown = 6
             self.direction -= 1
             self.direction %= 16
             self.update_direction()
 
     def turn_right(self):
         if self.rotation_cooldown <= 0:
-            self.rotation_cooldown = 5
+            self.rotation_cooldown = 6
             self.direction += 1
             self.direction %= 16
             self.update_direction()

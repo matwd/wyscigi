@@ -10,7 +10,7 @@ class Vector:
         return self / self.length()
 
     def scalar_product(self, second):
-        return self.x * second.y + self.y * second.y
+        return self.x * second.x + self.y * second.y
 
     def __mul__(self, scalar):
         return Vector(self.x * scalar, self.y * scalar)

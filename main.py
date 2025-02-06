@@ -35,10 +35,10 @@ class Game:
         pygame.init()
         self.screen = pygame.display.set_mode([800, 500])
 
-        self.sprites = [pygame.image.load(f"car-sprites/{i:>04}.png").convert_alpha() for i in range(1, 17)]
+        self.sprites = [pygame.image.load(f"assets/car-sprites/car-01/{i:>04}.png").convert_alpha() for i in range(1, 17)]
         self.clock = pygame.time.Clock()
 
-        self.map = Map(self.screen, "map-image.png", "map-hitbox.png")
+        self.map = Map(self.screen, "assets/maps/map-01/map-image.png", "assets/maps/map-01/map-hitbox.png")
         self.init_cars()
 
     def init_cars(self):

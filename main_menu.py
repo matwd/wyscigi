@@ -8,8 +8,7 @@ class MainMenu:
     def update(self, events):
         for event in events:
             if event.type == pygame.KEYDOWN:
-                self.game.state = 1
-                self.game.gameState = 1
+                self.game.start_race(0, 0)
 
     def draw(self):
         text_surface, ract = self.font.render("Kliknij dowolny klawisz aby zacząć", pygame.color.THECOLORS["white"], size=0)

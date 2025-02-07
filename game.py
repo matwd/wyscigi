@@ -48,19 +48,24 @@ class Game:
         self.state = GameState.main_menu
 
         self.map = Map(self.screen, "assets/maps/map-01/map-image.png", "assets/maps/map-01/map-hitbox.png")
-        self.init_cars()
 
     def init_cars(self):
-        self.player_car = PlayerCar(self.screen, self.sprites, 0.8, 0.97)
-        self.player_car.map = self.map
-        self.player_car.x = 130
-        self.player_car.y = 130
+        self.cars = []
+        self.cars.append(PlayerCar(self.screen, self.sprites, 0.8, 0.97))
+        self.cars[0].map = self.map
+        self.cars[0].x = 130
+        self.cars[0].y = 130
 
     def run(self):
         self.running = True
         while self.running:
             self.mainloop()
         pygame.quit()
+
+    def start_race(self, map, player_car_sprites):
+        self.init_cars()
+
+        self.state = GameState.race
 
     def mainloop(self):
         events = pygame.event.get()
@@ -70,10 +75,12 @@ class Game:
             self.main_menu.draw()
 
         elif self.state == GameState.race:
-            self.player_car.update()
             self.map.draw_track()
-            self.player_car.draw()
             self.map.draw_background()
+
+            for car in self.cars:
+                car.update()
+                car.draw()
 
             self.clock.tick(60)
 

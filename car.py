@@ -122,3 +122,17 @@ class Car:
         point4 = self.position + Vector(25 * math.cos(point4_rotation), 15 * math.sin(point4_rotation))
         self.points = [point1, point2, point3, point4]
 
+class PlayerCar(Car):
+    def update(self):
+        super().update()
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            self.turn_left()
+        if keys[pygame.K_RIGHT]:
+            self.turn_right()
+        if keys[pygame.K_UP]:
+            self.accelerate(0.15)
+        if keys[pygame.K_DOWN]:
+            self.accelerate(-0.15)
+
+

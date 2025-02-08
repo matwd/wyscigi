@@ -6,6 +6,7 @@ class ResultsScreen:
         self.game = game
         self.font = pygame.freetype.SysFont(pygame.freetype.get_default_font(), 40)
         self.page = 0
+        self.max_page = -1
 
     def update(self, events):
         for event in events:
@@ -13,7 +14,7 @@ class ResultsScreen:
                 if event.key == pygame.K_p:
                     self.page = max(0, self.page - 1)
                 if event.key == pygame.K_n:
-                    self.page += 1
+                    self.page = min(self.max_page, self.page + 1)
                 if event.key == pygame.K_RETURN:
                     self.game.show_main()
 
@@ -22,6 +23,9 @@ class ResultsScreen:
 
         with open("results.json", "r") as file:
             ranking = json.load(file)
+
+        if self.max_page == -1:
+            self.max_page = len(ranking) // 8
 
         ranking = sorted(ranking, key=lambda x: x["time"])
         

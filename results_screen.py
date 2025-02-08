@@ -30,7 +30,6 @@ class ResultsScreen:
         ranking = sorted(ranking, key=lambda x: x["time"])
         
         for i, result in enumerate(ranking):
-            # add pagination
             if i < self.page * 8:
                 continue
             if i >= (self.page + 1) * 8:
@@ -38,10 +37,3 @@ class ResultsScreen:
 
             text_surface, ract = self.font.render(f"{result['name']}: {float(result['time']):.2f}", pygame.color.THECOLORS["white"], size=0)
             self.game.screen.blit(text_surface, (40, 40 + (50 * (i - self.page * 8))))
-
-        # for i, result in enumerate(ranking):
-        #     if i > 7:
-        #         break
-
-        #     text_surface, ract = self.font.render(f"{result['name']}: {float(result['time']):.2f}", pygame.color.THECOLORS["white"], size=0)
-        #     self.game.screen.blit(text_surface, (40, 40 + (50 * i)))

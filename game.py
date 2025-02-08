@@ -15,6 +15,10 @@ debug = True
 
 # Wszystkie obroty są w radianach
 class Map:
+    """
+    Klasa odpowiedzialna za rysowanie toru gry i zapytania dotyczące
+    kolizji z torem
+    """
     def __init__(self, screen, image_filename, hitbox_filename):
         self.screen = screen
         self.hitbox = pygame.image.load(hitbox_filename).convert_alpha()
@@ -39,7 +43,11 @@ class Map:
 
 
 class Game:
+    """
+    Klasa gry. Obsługuje pętle główną i zamykanie okna gry
+    """
     def __init__(self):
+        # Inicjalizowanie biblioteki pygame i otworzenie okna
         pygame.init()
         pygame.font.init()
         self.screen = pygame.display.set_mode([800, 500])
@@ -63,9 +71,14 @@ class Game:
         self.cars[0].y = 130
 
     def run(self):
+        """
+        Gra po uruchomieniu wywołuje pętlę główną gry 60 razy na sekundę
+        aż do ustawienia zmienner self.running na False
+        """
         self.running = True
         while self.running:
             self.mainloop()
+            self.clock.tick(60)
         pygame.quit()
 
     def start_race(self, map, player_car_sprites):
@@ -94,7 +107,6 @@ class Game:
 
         elif self.state == GameState.race:
             self.map.draw_track()
-            self.map.draw_background()
 
             for event in events:
                 if event.type == pygame.KEYDOWN:
@@ -105,7 +117,8 @@ class Game:
                 car.update()
                 car.draw()
 
-            self.clock.tick(60)
+            self.map.draw_background()
+
 
         elif self.state == GameState.end_screen:
             self.end_screen.update(events)

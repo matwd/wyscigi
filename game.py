@@ -94,7 +94,6 @@ class Game:
 
         elif self.state == GameState.race:
             self.map.draw_track()
-            self.map.draw_background()
 
             for event in events:
                 if event.type == pygame.KEYDOWN:
@@ -104,6 +103,8 @@ class Game:
             for car in self.cars:
                 car.update()
                 car.draw()
+
+            self.map.draw_background()
 
             self.clock.tick(60)
 

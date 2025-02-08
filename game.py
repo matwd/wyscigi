@@ -1,11 +1,15 @@
 import pygame
+import random
 from main_menu import MainMenu
+from end_screen import EndScreen
+from results_screen import ResultsScreen
 from car import PlayerCar
 
 class GameState():
     main_menu = 0
     race = 1
     end_screen = 2
+    result_screen = 3
 
 debug = True
 
@@ -45,6 +49,8 @@ class Game:
 
         self.time = 0
         self.main_menu = MainMenu(self)
+        self.end_screen = EndScreen(self)
+        self.results_screen = ResultsScreen(self)
         self.state = GameState.main_menu
 
         self.map = Map(self.screen, "assets/maps/map-01/map-image.png", "assets/maps/map-01/map-hitbox.png")
@@ -67,8 +73,20 @@ class Game:
 
         self.state = GameState.race
 
+    def end_race(self):
+        self.time = random.randint(2000, 5000) / 100
+        self.state = GameState.end_screen
+
+    def show_result(self):
+        self.state = GameState.result_screen
+
+    def show_main(self):
+        self.state = GameState.main_menu
+
     def mainloop(self):
         events = pygame.event.get()
+
+        self.screen.fill((0, 0, 0))
 
         if self.state == GameState.main_menu:
             self.main_menu.update(events)
@@ -78,6 +96,11 @@ class Game:
             self.map.draw_track()
             self.map.draw_background()
 
+            for event in events:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:
+                        self.end_race()
+
             for car in self.cars:
                 car.update()
                 car.draw()
@@ -85,8 +108,13 @@ class Game:
             self.clock.tick(60)
 
         elif self.state == GameState.end_screen:
-            self.end_screen.update()
+            self.end_screen.update(events)
             self.end_screen.draw()
+
+        elif self.state == GameState.result_screen:
+            self.results_screen.update(events)
+            self.results_screen.draw()
+
         pygame.display.flip()
 
         # zamykanie gry

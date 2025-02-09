@@ -40,6 +40,7 @@ class Map:
         rect = self.screen.get_rect()
         image_rect = pygame.Rect(0, 0, 800, 500)
         self.screen.blit(self.image, image_rect)
+        # RectangleHitbox(100, 100, 0, 40, 30).draw(self.screen)
 
 
 class Game:
@@ -65,7 +66,7 @@ class Game:
 
     def init_cars(self):
         self.cars = []
-        self.cars.append(PlayerCar(self.screen, self.sprites, 0.8, 0.97))
+        self.cars.append(PlayerCar(self.screen, self.sprites, 0.1, 0.98))
         self.cars[0].map = self.map
         self.cars[0].x = 130
         self.cars[0].y = 130
@@ -76,6 +77,7 @@ class Game:
         aż do ustawienia zmienner self.running na False
         """
         self.running = True
+        self.start_race(self.map, self.sprites)
         while self.running:
             self.mainloop()
             self.clock.tick(60)

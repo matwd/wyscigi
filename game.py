@@ -4,6 +4,7 @@ from main_menu import MainMenu
 from end_screen import EndScreen
 from results_screen import ResultsScreen
 from car import PlayerCar
+from hitbox import RectangleHitbox
 
 class GameState():
     main_menu = 0
@@ -63,6 +64,10 @@ class Game:
         self.state = GameState.main_menu
 
         self.map = Map(self.screen, "assets/maps/map-01/map-image.png", "assets/maps/map-01/map-hitbox.png")
+        import math
+        self.progress_rectangles = [
+            RectangleHitbox(135, 135, math.pi / 4, 160, 60)
+        ]
 
     def init_cars(self):
         self.cars = []
@@ -120,6 +125,9 @@ class Game:
                 car.draw()
 
             self.map.draw_background()
+            
+            for i in self.progress_rectangles:
+                i.draw(self.screen)
 
 
         elif self.state == GameState.end_screen:

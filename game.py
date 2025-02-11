@@ -81,7 +81,6 @@ class Game:
         aż do ustawienia zmienner self.running na False
         """
         self.running = True
-        self.start_race(self.map, self.sprites)
         while self.running:
             self.mainloop()
             self.clock.tick(60)

@@ -92,9 +92,8 @@ class Game:
         self.music.stop()
         self.music.unload()
 
-        # https://www.youtube.com/watch?v=qnMlGIxydjA
-        self.music.load("assets/music/race.mp3")
-        self.music.play(-1)
+        self.music.load("./assets/music/level_1.mp3");
+        self.music.play(-1);
 
         self.state = GameState.race
 
@@ -109,8 +108,7 @@ class Game:
         self.music.stop()
         self.music.unload()
 
-        # https://youtu.be/hgdTS7vjvfg?feature=shared
-        self.music.load("assets/music/main_menu.mp3")
+        self.music.load("assets/music/level_3.ogg")
         self.music.play(-1)
 
         self.state = GameState.main_menu

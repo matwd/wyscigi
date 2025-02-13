@@ -52,6 +52,8 @@ class Game:
         # Inicjalizowanie biblioteki pygame i otworzenie okna
         pygame.init()
         pygame.font.init()
+
+        pygame.mixer.init()
         self.screen = pygame.display.set_mode([800, 500], pygame.RESIZABLE)
 
         self.sprites = [pygame.image.load(f"assets/car-sprites/car-01/{i:>04}.png").convert_alpha() for i in range(1, 17)]
@@ -61,7 +63,6 @@ class Game:
         self.main_menu = MainMenu(self)
         self.end_screen = EndScreen(self)
         self.results_screen = ResultsScreen(self)
-        self.state = GameState.main_menu
 
         self.map = Map(self.screen, "assets/maps/map-01/map-image.png", "assets/maps/map-01/map-hitbox.png")
         import math
@@ -70,6 +71,10 @@ class Game:
             RectangleHitbox(400, 360, 0, 60, 160),
             RectangleHitbox(135, 135, math.pi / 4, 160, 60),
         ]
+
+        self.music = pygame.mixer.music
+
+        self.show_main()
 
     def init_cars(self):
         self.cars = []
@@ -87,7 +92,6 @@ class Game:
         aż do ustawienia zmienner self.running na False
         """
         self.running = True
-        self.start_race(self.map, self.sprites)
         while self.running:
             self.mainloop()
             self.clock.tick(60)
@@ -95,6 +99,13 @@ class Game:
 
     def start_race(self, map, player_car_sprites):
         self.init_cars()
+
+        self.music.stop()
+        self.music.unload()
+
+        # https://www.youtube.com/watch?v=qnMlGIxydjA
+        self.music.load("assets/music/race.mp3")
+        self.music.play(-1)
 
         self.state = GameState.race
 
@@ -106,12 +117,21 @@ class Game:
         self.state = GameState.result_screen
 
     def show_main(self):
+        self.music.stop()
+        self.music.unload()
+
+        # https://youtu.be/hgdTS7vjvfg?feature=shared
+        self.music.load("assets/music/main_menu.mp3")
+        self.music.play(-1)
+
         self.state = GameState.main_menu
 
     def mainloop(self):
         events = pygame.event.get()
 
         self.screen.fill((0, 0, 0))
+
+        print(f"State: {self.state}")
 
         if self.state == GameState.main_menu:
             self.main_menu.update(events)

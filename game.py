@@ -52,7 +52,7 @@ class Game:
         # Inicjalizowanie biblioteki pygame i otworzenie okna
         pygame.init()
         pygame.font.init()
-        self.screen = pygame.display.set_mode([800, 500])
+        self.screen = pygame.display.set_mode([800, 500], pygame.RESIZABLE)
 
         self.sprites = [pygame.image.load(f"assets/car-sprites/car-01/{i:>04}.png").convert_alpha() for i in range(1, 17)]
         self.clock = pygame.time.Clock()
@@ -66,7 +66,9 @@ class Game:
         self.map = Map(self.screen, "assets/maps/map-01/map-image.png", "assets/maps/map-01/map-hitbox.png")
         import math
         self.progress_rectangles = [
-            RectangleHitbox(135, 135, math.pi / 4, 160, 60)
+            RectangleHitbox(600, 100, 0, 60, 160),
+            RectangleHitbox(400, 360, 0, 60, 160),
+            RectangleHitbox(135, 135, math.pi / 4, 160, 60),
         ]
 
     def init_cars(self):
@@ -75,6 +77,9 @@ class Game:
         self.cars[0].map = self.map
         self.cars[0].x = 130
         self.cars[0].y = 130
+        self.cars[0].okrazenie = 0
+        self.cars[0].track_progress = 0
+
 
     def run(self):
         """
@@ -124,10 +129,18 @@ class Game:
                 car.update()
                 car.draw()
 
+                if self.progress_rectangles[car.track_progress].check_hit(self.screen, car.position):
+                    car.track_progress += 1
+                    if car.track_progress == len(self.progress_rectangles):
+                        car.okrazenie += 1
+                        car.track_progress = 0
+                        if car.okrazenie == 3 and isinstance(car, PlayerCar):
+                            self.end_race()
+
             self.map.draw_background()
-            
-            for i in self.progress_rectangles:
-                i.draw(self.screen)
+
+            # for i in self.progress_rectangles:
+                # i.draw(self.screen)
 
 
         elif self.state == GameState.end_screen:

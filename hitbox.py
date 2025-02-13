@@ -29,3 +29,9 @@ class RectangleHitbox:
         pygame.draw.circle(screen, (200, 0, 0), tuple(points[2]), 2)
         pygame.draw.circle(screen, (250, 0, 0), tuple(points[3]), 2)
 
+    def check_hit(self, screen, point):
+        relative_vector = self.pos - point
+        relative_vector.rotate(-self.rotation)
+        if abs(relative_vector.x) < self.width / 2 and abs(relative_vector.y) < self.height / 2:
+            return True
+

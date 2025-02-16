@@ -36,16 +36,20 @@ class GameSettings:
     def update(self, events):
         mouse_pos = pygame.mouse.get_pos()
         self.play_button.changeColor(mouse_pos)
-        self.car_1_btn.changeColor(mouse_pos)
-        self.car_2_btn.changeColor(mouse_pos)
-        self.car_3_btn.changeColor(mouse_pos)
-        self.car_4_btn.changeColor(mouse_pos)
 
-        for car_btn in self.car_btns:
+        for index, car_btn in enumerate(self.car_btns,start=1):
+            car_btn.text_color=(255,0,0)
+            if index == self.chosen_car:
+                car_btn.text_color = (255,141,161)
             car_btn.changeColor(mouse_pos)
+            
                 
-        for map_btn in self.map_btns:
+        for index, map_btn in enumerate(self.map_btns,start=1):
+            map_btn.text_color = (255,0,0)
+            if index == self.chosen_map:
+                map_btn.text_color=(255,141,161)
             map_btn.changeColor(mouse_pos)
+           
             
 
         for event in events:

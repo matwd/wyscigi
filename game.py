@@ -25,7 +25,7 @@ class Map:
         self.hitbox = pygame.image.load(hitbox_filename).convert()
         self.background = pygame.image.load(track_filename).convert()
         self.overlay = pygame.image.load(overlay_filename).convert_alpha()
-        self.dimensions = image_rect = pygame.Rect(0, 0, 1024, 576)
+        self.dimensions = image_rect = pygame.Rect(0, 0, 1920, 576)
 
     def is_point_on_track(self, vec):
         rect = self.hitbox.get_rect()
@@ -53,7 +53,7 @@ class Game:
         pygame.mixer.init()
         self.real_screen = pygame.display.set_mode([1920, 1080], pygame.RESIZABLE)
 
-        self.screen = pygame.Surface([1024, 576])
+        self.screen = pygame.Surface([1920, 1080])
 
         self.sprites = [pygame.image.load(f"assets/car-sprites/car-01/{i:>04}.png").convert_alpha() for i in range(1, 17)]
         self.clock = pygame.time.Clock()
@@ -82,8 +82,8 @@ class Game:
 
         for car in self.cars:
             car.map = self.map
-            car.x = 260
-            car.y = 260
+            car.x = 500
+            car.y = 500
             car.okrazenie = 0
             car.track_progress = 0
 

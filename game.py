@@ -3,7 +3,7 @@ import random
 from main_menu import MainMenu
 from end_screen import EndScreen
 from results_screen import ResultsScreen
-from car import PlayerCar
+from car import PlayerCar, EnemyCar
 from hitbox import RectangleHitbox
 
 class GameState():
@@ -20,10 +20,12 @@ class Map:
     Klasa odpowiedzialna za rysowanie toru gry i zapytania dotyczące
     kolizji z torem
     """
-    def __init__(self, screen, image_filename, hitbox_filename):
+    def __init__(self, screen, track_filename, overlay_filename, hitbox_filename):
         self.screen = screen
-        self.hitbox = pygame.image.load(hitbox_filename).convert_alpha()
-        self.image = pygame.image.load(image_filename).convert_alpha()
+        self.hitbox = pygame.image.load(hitbox_filename).convert()
+        self.background = pygame.image.load(track_filename).convert()
+        self.overlay = pygame.image.load(overlay_filename).convert_alpha()
+        self.dimensions = image_rect = pygame.Rect(0, 0, 1920, 576)
 
     def is_point_on_track(self, vec):
         rect = self.hitbox.get_rect()
@@ -32,17 +34,12 @@ class Map:
 
         return False
 
-    def draw_track(self):
-        rect = self.screen.get_rect()
-        image_rect = pygame.Rect(0, 0, 800, 500)
-        self.screen.blit(self.hitbox, image_rect)
-
     def draw_background(self):
-        rect = self.screen.get_rect()
-        image_rect = pygame.Rect(0, 0, 800, 500)
-        self.screen.blit(self.image, image_rect)
+        self.screen.blit(self.background, self.dimensions)
         # RectangleHitbox(100, 100, 0, 40, 30).draw(self.screen)
 
+    def draw_overlay(self):
+        self.screen.blit(self.overlay, self.dimensions)
 
 class Game:
     """
@@ -54,7 +51,9 @@ class Game:
         pygame.font.init()
 
         pygame.mixer.init()
-        self.screen = pygame.display.set_mode([800, 500], pygame.RESIZABLE)
+        self.real_screen = pygame.display.set_mode([1920, 1080], pygame.RESIZABLE)
+
+        self.screen = pygame.Surface([1920, 1080])
 
         self.sprites = [pygame.image.load(f"assets/car-sprites/car-01/{i:>04}.png").convert_alpha() for i in range(1, 17)]
         self.clock = pygame.time.Clock()
@@ -64,7 +63,7 @@ class Game:
         self.end_screen = EndScreen(self)
         self.results_screen = ResultsScreen(self)
 
-        self.map = Map(self.screen, "assets/maps/map-01/map-image.png", "assets/maps/map-01/map-hitbox.png")
+        self.map = Map(self.screen, "assets/maps/map-01/track.png", "assets/maps/map-01/overlay.png", "assets/maps/map-01/hitbox.png")
         import math
         self.progress_rectangles = [
             RectangleHitbox(600, 100, 0, 60, 160),
@@ -78,12 +77,15 @@ class Game:
 
     def init_cars(self):
         self.cars = []
-        self.cars.append(PlayerCar(self.screen, self.sprites, 0.1, 0.98))
-        self.cars[0].map = self.map
-        self.cars[0].x = 130
-        self.cars[0].y = 130
-        self.cars[0].okrazenie = 0
-        self.cars[0].track_progress = 0
+        self.cars.append(PlayerCar(self, self.sprites, 0.1, 0.98))
+        self.cars.append(EnemyCar(self, self.sprites, 0.1, 0.98))
+
+        for car in self.cars:
+            car.map = self.map
+            car.x = 500
+            car.y = 500
+            car.okrazenie = 0
+            car.track_progress = 0
 
 
     def run(self):
@@ -94,7 +96,8 @@ class Game:
         self.running = True
         while self.running:
             self.mainloop()
-            self.clock.tick(60)
+            a = self.clock.tick(60)
+            print(a)
         pygame.quit()
 
     def start_race(self, map, player_car_sprites):
@@ -129,14 +132,12 @@ class Game:
 
         self.screen.fill((0, 0, 0))
 
-        print(f"State: {self.state}")
-
         if self.state == GameState.main_menu:
             self.main_menu.update(events)
             self.main_menu.draw()
 
         elif self.state == GameState.race:
-            self.map.draw_track()
+            self.map.draw_background()
 
             for event in events:
                 if event.type == pygame.KEYDOWN:
@@ -155,7 +156,7 @@ class Game:
                         if car.okrazenie == 3 and isinstance(car, PlayerCar):
                             self.end_race()
 
-            self.map.draw_background()
+            self.map.draw_overlay()
 
             # for i in self.progress_rectangles:
                 # i.draw(self.screen)
@@ -169,6 +170,7 @@ class Game:
             self.results_screen.update(events)
             self.results_screen.draw()
 
+        self.real_screen.blit(pygame.transform.scale(self.screen, self.real_screen.get_size()), (0, 0, *self.real_screen.get_size()))
         pygame.display.flip()
 
         # zamykanie gry

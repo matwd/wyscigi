@@ -5,8 +5,8 @@ import random
 from hitbox import RectangleHitbox
 
 class Car:
-    def __init__(self, screen, sprites, poslizg, tarcie):
-        self.screen = screen
+    def __init__(self, game, sprites, poslizg, tarcie):
+        self.game = game
         self.sprites = sprites
         self.poslizg = poslizg
         self.tarcie = tarcie
@@ -14,7 +14,7 @@ class Car:
         self.velocity = Vector(0, 0)
         self.rotation_cooldown = 0
         self.direction = 0
-        self.hitbox = RectangleHitbox(self.x, self.y, 0, 40, 20)
+        self.hitbox = RectangleHitbox(self.x, self.y, 0, 40*2, 20*2)
         self.update_direction()
 
     @property
@@ -82,20 +82,20 @@ class Car:
 
     def draw(self):
         rect = self.sprites[0].get_rect()
-        image_rect = pygame.Rect(self.x-rect.width//2, self.y-rect.width//2+random.randint(-1, 1), 128, 128)
-        self.screen.blit(self.sprites[self.direction], image_rect)
+        image_rect = pygame.Rect(self.x-rect.width, self.y-rect.width+random.randint(-1, 1), 256, 256)
+        self.game.screen.blit(pygame.transform.scale(self.sprites[self.direction], (128, 128)), image_rect)
 
         self.hitbox.pos = self.position
-        # self.hitbox.draw(self.screen)
-        # pygame.draw.line(self.screen, (255, 0, 255), tuple(self.position), tuple(self.position + self.velocity * 20))
-        # pygame.draw.circle(self.screen, pygame.Color('blue'), (self.x, self.y), 3)
+        # self.hitbox.draw(self.game.screen)
+        # pygame.draw.line(self.game.screen, (255, 0, 255), tuple(self.position), tuple(self.position + self.velocity * 20))
+        # pygame.draw.circle(self.game.screen, pygame.Color('blue'), (self.x, self.y), 3)
         # for p in self.points:
-            # pygame.draw.circle(self.screen, pygame.Color('red'), tuple(p), 3)
+            # pygame.draw.circle(self.game.screen, pygame.Color('red'), tuple(p), 3)
 
     def turn_left(self):
         if self.rotation_cooldown <= 0:
             self.velocity = self.velocity.rotate(-0.2)
-            self.rotation_cooldown = 6
+            self.rotation_cooldown = 7
             self.direction -= 1
             self.direction %= 16
             self.update_direction()
@@ -103,7 +103,7 @@ class Car:
     def turn_right(self):
         if self.rotation_cooldown <= 0:
             self.velocity = self.velocity.rotate(0.4 - self.poslizg)
-            self.rotation_cooldown = 6
+            self.rotation_cooldown = 7
             self.direction += 1
             self.direction %= 16
             self.update_direction()
@@ -140,8 +140,62 @@ class PlayerCar(Car):
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.turn_right()
         if keys[pygame.K_UP] or keys[pygame.K_w]:
-            self.accelerate(0.1)
+            self.accelerate(0.2)
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            self.accelerate(-0.1)
+            self.accelerate(-0.2)
 
+class EnemyCar(Car):
+    def __init__(self, *args):
+        print(args)
+        super().__init__(*args)
+        self.close_wall_check_cooldown = 0
+
+    def update(self):
+        super().update()
+
+        directions = [
+            (self.direction + off) / 16 * math.tau for off in range(-2, 3)
+        ]
+        lidar = [
+            self.ray_march(self.position, Vector(1, 0).rotate(d)) for d in directions
+        ]
+        for p in lidar:
+            pygame.draw.line(self.game.screen, (255, 0, 0), tuple(self.position), tuple(p))
+
+        lidar = [(i - self.position).length() for i in lidar]
+
+        left = (lidar[0] + lidar[1]) / 2
+        center = lidar[2]
+        right = (lidar[3] + lidar[4]) / 2
+        # if center < 200:
+        if self.close_wall_check_cooldown < 0:
+            if right < 50:
+                self.turn_left()
+                self.close_wall_check_cooldown = 10
+            elif left < 50:
+                self.turn_right()
+                self.close_wall_check_cooldown = 10
+
+            elif left > center and left > right:
+                self.turn_left()
+
+            elif right > left and right > center:
+                self.turn_right()
+
+            else:
+                self.accelerate(0.2)
+        else:
+            self.accelerate(0.2)
+
+        self.close_wall_check_cooldown -= 1
+#        if lidar[0] < lidar[2] * 0.2:
+#            self.turn_left()
+#        if lidar[2] < lidar[0] * 0.2:
+#            self.turn_right()
+
+
+    def ray_march(self, start, direction):
+        while self.game.map.is_point_on_track(start):
+            start += direction * 5
+        return start
 

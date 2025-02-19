@@ -24,10 +24,15 @@ class RectangleHitbox:
     def draw(self, screen):
         points = self.get_points()
 
-        pygame.draw.circle(screen, (100, 0, 0), tuple(points[0]), 2)
-        pygame.draw.circle(screen, (150, 0, 0), tuple(points[1]), 2)
-        pygame.draw.circle(screen, (200, 0, 0), tuple(points[2]), 2)
-        pygame.draw.circle(screen, (250, 0, 0), tuple(points[3]), 2)
+        pygame.draw.circle(screen, (100, 0, 0), tuple(points[0]), 3)
+        pygame.draw.circle(screen, (150, 0, 0), tuple(points[1]), 3)
+        pygame.draw.circle(screen, (200, 0, 0), tuple(points[2]), 3)
+        pygame.draw.circle(screen, (250, 0, 0), tuple(points[3]), 3)
+
+        pygame.draw.line(screen, (255, 0, 0), tuple(points[0]), tuple(points[1]), 3)
+        pygame.draw.line(screen, (255, 0, 0), tuple(points[1]), tuple(points[2]), 3)
+        pygame.draw.line(screen, (255, 0, 0), tuple(points[2]), tuple(points[3]), 3)
+        pygame.draw.line(screen, (255, 0, 0), tuple(points[3]), tuple(points[0]), 3)
 
     def check_hit(self, screen, point):
         relative_vector = self.pos - point

@@ -25,7 +25,7 @@ class Map:
         self.hitbox = pygame.image.load(hitbox_filename).convert()
         self.background = pygame.image.load(track_filename).convert()
         self.overlay = pygame.image.load(overlay_filename).convert_alpha()
-        self.dimensions = image_rect = pygame.Rect(0, 0, 1920, 576)
+        self.dimensions = image_rect = pygame.Rect(0, 0, 1920, 1080)
 
     def is_point_on_track(self, vec):
         rect = self.hitbox.get_rect()
@@ -36,7 +36,6 @@ class Map:
 
     def draw_background(self):
         self.screen.blit(self.background, self.dimensions)
-        # RectangleHitbox(100, 100, 0, 40, 30).draw(self.screen)
 
     def draw_overlay(self):
         self.screen.blit(self.overlay, self.dimensions)
@@ -64,13 +63,11 @@ class Game:
         self.results_screen = ResultsScreen(self)
 
         self.map = Map(self.screen, "assets/maps/map-01/track.png", "assets/maps/map-01/overlay.png", "assets/maps/map-01/hitbox.png")
-        import math
         self.progress_rectangles = [
-            RectangleHitbox(600, 100, 0, 60, 160),
-            RectangleHitbox(400, 360, 0, 60, 160),
-            RectangleHitbox(135, 135, math.pi / 4, 160, 60),
+            RectangleHitbox(1200, 150, 0, 300, 200),
+            RectangleHitbox(200, 650, 0, 400, 500),
+            RectangleHitbox(1750, 400, 0, 250, 200),
         ]
-
         self.music = pygame.mixer.music
 
         self.show_main()
@@ -158,8 +155,8 @@ class Game:
 
             self.map.draw_overlay()
 
-            # for i in self.progress_rectangles:
-                # i.draw(self.screen)
+            for i in self.progress_rectangles:
+                i.draw(self.screen)
 
 
         elif self.state == GameState.end_screen:

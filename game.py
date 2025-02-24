@@ -50,7 +50,13 @@ class Game:
         pygame.init()
         pygame.font.init()
 
-        pygame.mixer.init()
+        self.sound = True
+        try:
+            pygame.mixer.init()
+        except pygame.error:
+            print("brak wyjścia audio")
+            self.sound = False
+            
         self.real_screen = pygame.display.set_mode([1920, 1080], pygame.RESIZABLE)
 
         self.screen = pygame.Surface([1920, 1080])
@@ -103,11 +109,12 @@ class Game:
     def start_race(self, map, player_car_sprites):
         self.init_cars()
 
-        self.music.stop()
-        self.music.unload()
+        if self.sound:
+            self.music.stop()
+            self.music.unload()
 
-        self.music.load("./assets/music/level_1.mp3");
-        self.music.play(-1);
+            self.music.load("./assets/music/level_1.mp3")
+            self.music.play(-1)
 
         self.state = GameState.race
 
@@ -119,11 +126,13 @@ class Game:
         self.state = GameState.result_screen
 
     def show_main(self):
-        self.music.stop()
-        self.music.unload()
+        if self.sound:
+                
+            self.music.stop()
+            self.music.unload()
 
-        self.music.load("assets/music/level_3.ogg")
-        self.music.play(-1)
+            self.music.load("assets/music/level_3.ogg")
+            self.music.play(-1)
 
         self.state = GameState.main_menu
 

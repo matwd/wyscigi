@@ -3,7 +3,7 @@ import pygame
 class MainMenu:
     def __init__(self, game):
         self.game = game
-        self.font = pygame.font.Font("./assets/6809 Chargen.otf", 40)
+        self.font = pygame.font.Font(pygame.freetype.get_default_font(), 40)
 
     def update(self, events):
         for event in events:

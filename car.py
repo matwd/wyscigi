@@ -108,7 +108,7 @@ class Car:
             # pygame.draw.circle(self.game.screen, pygame.Color('red'), tuple(p), 3)
 
     def turn_left(self):
-        if self.rotation_cooldown <= 0:
+        if self.rotation_cooldown <= 0 and self.spin <= 0:
             self.velocity = self.velocity.rotate(-0.4 + self.poslizg)
             self.rotation_cooldown = 7
             self.direction -= 1
@@ -116,7 +116,7 @@ class Car:
             self.update_direction()
 
     def turn_right(self):
-        if self.rotation_cooldown <= 0:
+        if self.rotation_cooldown <= 0 and self.spin <= 0:
             self.velocity = self.velocity.rotate(0.4 - self.poslizg)
             self.rotation_cooldown = 7
             self.direction += 1

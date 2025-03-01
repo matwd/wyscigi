@@ -1,9 +1,30 @@
 from vector import Vector
 import pygame
 
-class RectangleHitbox:
+class Hitbox:
+    def __init__(self):
+        raise NotImplementedError("Nie zaimplementowano inicjalizacji wektora")
+
+    def draw(self, screen):
+        raise NotImplementedError("Nie zaimplementowano rysowania hitboxa")
+
+    def check_hit(self, point):
+        raise NotImplementedError("Nie zaimplementowano sprawdzania przynależności punktu do hitboxa")
+
+class CircleHitbox(Hitbox):
+    def __init__(self, x, y, radius):
+        self.position = Vector(x, y)
+        self.radius = radius
+
+    def draw(self, screen):
+        pygame.draw.circle(screen, (255, 0, 0, 0), tuple(self.position), self.radius)
+
+    def check_hit(self, point):
+        return (self.position - point).length() < self.radius
+
+class RectangleHitbox(Hitbox):
     def __init__(self, x, y, rotation, width, height):
-        self.pos = Vector(x, y)
+        self.position = Vector(x, y)
         self.rotation = rotation
         self.width = width
         self.height = height
@@ -14,10 +35,10 @@ class RectangleHitbox:
         point3_offset = -point1_offset
         point4_offset = -point2_offset
 
-        point1 = point1_offset + self.pos
-        point2 = point2_offset + self.pos
-        point3 = point3_offset + self.pos
-        point4 = point4_offset + self.pos
+        point1 = point1_offset + self.position
+        point2 = point2_offset + self.position
+        point3 = point3_offset + self.position
+        point4 = point4_offset + self.position
 
         return (point1, point2, point3, point4)
 
@@ -34,8 +55,8 @@ class RectangleHitbox:
         pygame.draw.line(screen, (255, 0, 0), tuple(points[2]), tuple(points[3]), 3)
         pygame.draw.line(screen, (255, 0, 0), tuple(points[3]), tuple(points[0]), 3)
 
-    def check_hit(self, screen, point):
-        relative_vector = self.pos - point
+    def check_hit(self, point):
+        relative_vector = self.position - point
         relative_vector.rotate(-self.rotation)
         if abs(relative_vector.x) < self.width / 2 and abs(relative_vector.y) < self.height / 2:
             return True

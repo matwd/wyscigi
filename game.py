@@ -3,7 +3,7 @@ import random
 from main_menu import MainMenu
 from end_screen import EndScreen
 from results_screen import ResultsScreen
-from car import PlayerCar, EnemyCar1, EnemyCar2
+from car import PlayerCar, EnemyCar1, EnemyCar2, EnemyCar3
 from hitbox import RectangleHitbox, CircleHitbox
 from obstacle import Obstacle
 from vector import Vector
@@ -84,6 +84,7 @@ class Game:
         self.cars.append(PlayerCar(self, self.sprites, 0.1, 0.99))
         self.cars.append(EnemyCar1(self, self.sprites, 0.1, 0.99))
         self.cars.append(EnemyCar2(self, self.sprites, 0.1, 0.99))
+        self.cars.append(EnemyCar3(self, self.sprites, 0.1, 0.99))
 
         for car in self.cars:
             car.map = self.map

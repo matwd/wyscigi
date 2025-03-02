@@ -166,28 +166,9 @@ class PlayerCar(Car):
                 self.nitro -= 5
                 self.accelerate(0.6)
 
-class EnemyCar1(Car):
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.points = [
-            CircleHitbox(550, 500, 60),
-            CircleHitbox(550, 300, 60),
-            CircleHitbox(700, 170, 60),
-            CircleHitbox(1600, 170, 60),
-            CircleHitbox(1750, 740, 60),
-            CircleHitbox(1050, 450, 60),
-            CircleHitbox(850, 750, 60),
-            CircleHitbox(200, 780, 60),
-            CircleHitbox(200, 550, 60),
-        ]
-        self.next_target = 0
-
-    def update(self):
-        super().update()
-
-        # target = Vector(*pygame.mouse.get_pos())
-        target = self.points[self.next_target]
-        wanted_direction = target.position - self.position
+class EnemyCar(Car):
+    def turn_to_target(self, target: Vector):
+        wanted_direction = target - self.position
         angle_to_target = math.atan2(wanted_direction.y, wanted_direction.x) + (math.tau/32)
         target_rotation = int(angle_to_target // (math.tau/16)) % 16
 
@@ -198,16 +179,32 @@ class EnemyCar1(Car):
                 self.turn_left()
 
         if self.direction == target_rotation:
-            if wanted_direction.length() < 140 and self.velocity.length() > 4:
+            if wanted_direction.length() < 120 and self.velocity.length() > 4:
                 pass
             else:
                 self.accelerate(0.2)
 
-        print("v", self.velocity.length())
-        print(target)
-        print(wanted_direction)
-        print(angle_to_target)
-        print(target_rotation)
+class EnemyCar1(EnemyCar):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.points = [
+            CircleHitbox(520, 500, 100),
+            CircleHitbox(700, 170, 100),
+            CircleHitbox(1600, 170, 100),
+            CircleHitbox(1750, 740, 100),
+            CircleHitbox(1050, 450, 100),
+            CircleHitbox(850, 750, 100),
+            CircleHitbox(200, 780, 100),
+            CircleHitbox(200, 550, 100),
+        ]
+        self.next_target = 0
+
+    def update(self):
+        super().update()
+
+        # target = Vector(*pygame.mouse.get_pos())
+        target = self.points[self.next_target]
+        self.turn_to_target(target.position)
 
         if target.check_hit(self.position):
             self.next_target = (self.next_target + 1) % len(self.points)
@@ -217,7 +214,7 @@ class EnemyCar1(Car):
         # for d in self.points:
             # d.draw(self.game.screen)
 
-class EnemyCar2(Car):
+class EnemyCar2(EnemyCar):
     def __init__(self, *args):
         super().__init__(*args)
         self.close_wall_check_cooldown = 0
@@ -271,3 +268,42 @@ class EnemyCar2(Car):
             start += direction * 5
         return start
 
+
+class EnemyCar3(EnemyCar):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.points = [
+            CircleHitbox(520, 500, 100),
+            CircleHitbox(700, 170, 100),
+            CircleHitbox(1600, 170, 100),
+            CircleHitbox(1750, 740, 100),
+            CircleHitbox(1050, 450, 100),
+            CircleHitbox(850, 750, 100),
+            CircleHitbox(200, 780, 100),
+            CircleHitbox(200, 550, 100),
+        ]
+        self.next_target = 0
+
+    def update(self):
+        super().update()
+
+        # target = Vector(*pygame.mouse.get_pos())
+        target = self.points[self.next_target].position
+
+        player = filter(lambda x: isinstance(x, PlayerCar), self.game.cars).__iter__().__next__()
+        if (player.position - self.position).length() < 200:
+            possible_position = player.position + player.direction_vector.rotate(math.pi / 2) * 40
+            # CircleHitbox(*possible_position, 10).draw(self.game.screen)
+            target = possible_position
+
+        self.turn_to_target(target)
+
+        for index, point in enumerate(self.points):
+            if point.check_hit(self.position):
+                self.next_target = (index + 1) % len(self.points)
+
+
+    def draw(self):
+        super().draw()
+        # for d in self.points:
+            # d.draw(self.game.screen)

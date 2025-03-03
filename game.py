@@ -3,6 +3,7 @@ import random
 from main_menu import MainMenu
 from end_screen import EndScreen
 from results_screen import ResultsScreen
+from game_settings import GameSettings
 from car import PlayerCar, EnemyCar
 from hitbox import RectangleHitbox
 
@@ -11,6 +12,7 @@ class GameState():
     race = 1
     end_screen = 2
     result_screen = 3
+    game_settings = 4
 
 debug = True
 
@@ -68,6 +70,8 @@ class Game:
         self.main_menu = MainMenu(self)
         self.end_screen = EndScreen(self)
         self.results_screen = ResultsScreen(self)
+        self.game_settings = GameSettings(self)
+        self.state = GameState.main_menu
 
         self.map = Map(self.screen, "assets/maps/map-01/track.png", "assets/maps/map-01/overlay.png", "assets/maps/map-01/hitbox.png")
         import math
@@ -105,6 +109,9 @@ class Game:
             a = self.clock.tick(60)
             print(a)
         pygame.quit()
+
+    def open_settings(self):
+        self.state = GameState.game_settings
 
     def start_race(self, map, player_car_sprites):
         self.init_cars()
@@ -178,6 +185,10 @@ class Game:
         elif self.state == GameState.result_screen:
             self.results_screen.update(events)
             self.results_screen.draw()
+
+        elif self.state == GameState.game_settings:
+            self.game_settings.update(events)
+            self.game_settings.draw()
 
         self.real_screen.blit(pygame.transform.scale(self.screen, self.real_screen.get_size()), (0, 0, *self.real_screen.get_size()))
         pygame.display.flip()

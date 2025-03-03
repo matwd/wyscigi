@@ -1,3 +1,5 @@
+import math
+
 class Vector:
     def __init__(self, x=0, y=0):
         self.x = x
@@ -30,6 +32,9 @@ class Vector:
     def __sub__(self, second):
         return Vector(self.x - second.x, self.y - second.y)
 
+    def __neg__(self):
+        return Vector(-self.x, -self.y)
+
     def __str__(self):
         return f"Vector({self.x}, {self.y})"
 
@@ -39,3 +44,8 @@ class Vector:
             yield self.y
 
         return iterator()
+
+    def rotate(self, rotation):
+        "Obrócenie wektora wokół punktu zaczepienia"
+        s, c = math.sin(rotation), math.cos(rotation)
+        return Vector(c * self.x - s * self.y, c * self.y + s * self.x)

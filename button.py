@@ -27,7 +27,6 @@ class Button():
     def changeColor(self,position):
         position = [round(position[0]/self.real_screen.get_size()[0] * 1920), round(position[1] / self.real_screen.get_size()[1] * 1080)]
         if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
-            print("Wsrodku")
             self.text = self.font.render(self.text_var,True,self.hover_color)
         else:
             self.text = self.font.render(self.text_var, True, self.text_color)

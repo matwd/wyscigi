@@ -106,8 +106,8 @@ class Game:
         self.running = True
         while self.running:
             self.mainloop()
-            a = self.clock.tick(60)
-            print(a)
+            # a = self.clock.tick(60)
+            # print(a)
         pygame.quit()
 
     def open_settings(self):
@@ -126,7 +126,7 @@ class Game:
         self.state = GameState.race
 
     def end_race(self):
-        self.time = random.randint(2000, 5000) / 100
+        # self.time = random.randint(2000, 5000) / 100
         self.state = GameState.end_screen
 
     def show_result(self):
@@ -172,6 +172,7 @@ class Game:
                         if car.okrazenie == 3 and isinstance(car, PlayerCar):
                             self.end_race()
 
+            self.time += 60 / 1000
             self.map.draw_overlay()
 
             # for i in self.progress_rectangles:

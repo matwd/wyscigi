@@ -6,27 +6,28 @@ class GameSettings:
     def __init__(self, game):
 
         self.game = game
-        self.font = pygame.font.Font("assets/font/8-BIT WONDER.TTF", 100)
-        self.play_button = Button(pos=(960, 930), text_var="START THE RACE", font=self.font, text_color=(255,255,255),
+        self.font_100 = pygame.font.Font("assets/font/8-BIT WONDER.TTF", 100)
+        self.font_75 = pygame.font.Font("assets/font/8-BIT WONDER.TTF", 75)
+        self.play_button = Button(pos=(960, 930), text_var="START THE RACE", font=self.font_100, text_color=(255,255,255),
                                   hover_color=(86,86,86),real_screen=self.game.real_screen) #dodac flage szachownice do tła
-        self.car_pick_text = self.font.render("CHOOSE YOUR CAR", True, (255,255,255))
+        self.car_pick_text = self.font_100.render("CHOOSE YOUR CAR", True, (255,255,255))
         self.car_pick_rect = self.car_pick_text.get_rect(center=(960, 150))
 
-        self.car_1_btn = Button(pos=(384,350),text_var="CAR 1", font=self.font, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
-        self.car_2_btn = Button(pos=(768,350),text_var="CAR 2", font=self.font, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
-        self.car_3_btn = Button(pos=(1152,350),text_var="CAR 3", font=self.font, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
-        self.car_4_btn = Button(pos=(1536,350),text_var="CAR 4", font=self.font, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
+        self.car_1_btn = Button(pos=(384,350),text_var="CAR 1", font=self.font_75, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
+        self.car_2_btn = Button(pos=(768,350),text_var="CAR 2", font=self.font_75, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
+        self.car_3_btn = Button(pos=(1152,350),text_var="CAR 3", font=self.font_75, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
+        self.car_4_btn = Button(pos=(1536,350),text_var="CAR 4", font=self.font_75, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
 
         self.car_btns = [self.car_1_btn,self.car_2_btn,self.car_3_btn,self.car_4_btn]
 
         self.chosen_car = 1
 
-        self.map_pick_text = self.font.render("CHOOSE THE MAP", True, (255,255,255))
+        self.map_pick_text = self.font_100.render("CHOOSE THE MAP", True, (255,255,255))
         self.map_pick_rect = self.map_pick_text.get_rect(center=(960, 550))
 
-        self.map_1_btn = Button(pos=(480,700),text_var="MAP 1", font=self.font, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
-        self.map_2_btn = Button(pos=(960,700),text_var="MAP 2", font=self.font, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
-        self.map_3_btn = Button(pos=(1440,700),text_var="MAP 3", font=self.font, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
+        self.map_1_btn = Button(pos=(480,700),text_var="MAP 1", font=self.font_75, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
+        self.map_2_btn = Button(pos=(960,700),text_var="MAP 2", font=self.font_75, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
+        self.map_3_btn = Button(pos=(1440,700),text_var="MAP 3", font=self.font_75, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
 
         self.chosen_map = 1
 

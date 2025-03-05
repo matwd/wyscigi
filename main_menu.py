@@ -6,10 +6,10 @@ class MainMenu:
         
         self.game = game
         self.font = pygame.font.Font("assets/font/8-BIT WONDER.TTF", 100)
-        self.bg = pygame.image.load("assets/menu/mainmenu.png")
+        self.bg = pygame.image.load("assets/menu/mainmenu1920x1080.png")
 
         self.bg = pygame.transform.scale(self.bg,[1920,1080])
-        self.play_button = Button(pos=(1700,775), text_var="PLAY", font=self.font, text_color=(255, 255, 255),hover_color=(86, 86, 86),real_screen=self.game.real_screen)
+        self.play_button = Button(pos=(1600,775), text_var="PLAY", font=self.font, text_color=(255, 255, 255),hover_color=(86, 86, 86),real_screen=self.game.real_screen)
 
     def update(self, events):
         mouse_pos = pygame.mouse.get_pos()

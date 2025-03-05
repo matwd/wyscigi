@@ -10,9 +10,6 @@ class Button():
         self.text_var = text_var
         self.real_screen = real_screen
         self.text = self.font.render(self.text_var, True, self.text_color)
-
-        
-        # self.rect = self.button.get_rect(center=(self.x,self.y))
         self.rect = self.text.get_rect(center=(self.x,self.y))
 
     def update(self,screen):

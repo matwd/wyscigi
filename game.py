@@ -7,12 +7,14 @@ from car import PlayerCar, EnemyCar1, EnemyCar2, EnemyCar3
 from hitbox import RectangleHitbox, CircleHitbox
 from obstacle import Obstacle
 from vector import Vector
+from game_settings import GameSettings
 
 class GameState():
     main_menu = 0
     race = 1
     end_screen = 2
     result_screen = 3
+    game_settings = 4
 
 debug = True
 
@@ -51,7 +53,13 @@ class Game:
         pygame.init()
         pygame.font.init()
 
-        pygame.mixer.init()
+        self.sound = True
+        try:
+            pygame.mixer.init()
+        except pygame.error:
+            print("brak wyjścia audio")
+            self.sound = False
+            
         self.real_screen = pygame.display.set_mode([1920, 1080], pygame.RESIZABLE)
 
         self.screen = pygame.Surface([1920, 1080])
@@ -63,6 +71,8 @@ class Game:
         self.main_menu = MainMenu(self)
         self.end_screen = EndScreen(self)
         self.results_screen = ResultsScreen(self)
+        self.game_settings = GameSettings(self)
+        self.state = GameState.main_menu
 
         self.map = Map(self.screen, "assets/maps/map-01/track.png", "assets/maps/map-01/overlay.png", "assets/maps/map-01/hitbox.png")
         self.progress_rectangles = [
@@ -106,14 +116,18 @@ class Game:
             # print(a)
         pygame.quit()
 
+    def open_settings(self):
+        self.state = GameState.game_settings
+
     def start_race(self, map, player_car_sprites):
         self.init_cars()
 
-        self.music.stop()
-        self.music.unload()
+        if self.sound:
+            self.music.stop()
+            self.music.unload()
 
-        self.music.load("./assets/music/level_1.mp3");
-        self.music.play(-1);
+            self.music.load("./assets/music/level_1.mp3")
+            self.music.play(-1)
 
         self.state = GameState.race
 
@@ -125,11 +139,13 @@ class Game:
         self.state = GameState.result_screen
 
     def show_main(self):
-        self.music.stop()
-        self.music.unload()
+        if self.sound:
+                
+            self.music.stop()
+            self.music.unload()
 
-        self.music.load("assets/music/level_3.ogg")
-        self.music.play(-1)
+            self.music.load("assets/music/level_3.ogg")
+            self.music.play(-1)
 
         self.state = GameState.main_menu
 
@@ -183,6 +199,10 @@ class Game:
         elif self.state == GameState.result_screen:
             self.results_screen.update(events)
             self.results_screen.draw()
+
+        elif self.state == GameState.game_settings:
+            self.game_settings.update(events)
+            self.game_settings.draw()
 
         self.real_screen.blit(pygame.transform.scale(self.screen, self.real_screen.get_size()), (0, 0, *self.real_screen.get_size()))
         pygame.display.flip()

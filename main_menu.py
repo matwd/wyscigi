@@ -1,15 +1,21 @@
 import pygame
+from button import Button
 
 class MainMenu:
     def __init__(self, game):
+        
         self.game = game
-        self.font = pygame.font.Font(pygame.freetype.get_default_font(), 40)
+        self.font = pygame.font.SysFont(None, 40)
+        self.play_button = Button(pos=(200,300), text_var="WYBIERZ POJAZD I TOR", font=self.font, text_color=(255, 0, 0),hover_color=(255, 141, 161))
 
     def update(self, events):
+        mouse_pos = pygame.mouse.get_pos()
+        self.play_button.changeColor(mouse_pos)
         for event in events:
-            if event.type == pygame.KEYDOWN:
-                self.game.start_race(0, 0)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.play_button.checkForInput(mouse_pos):
+                    self.game.open_settings()
+
 
     def draw(self):
-        text_surface = self.font.render("Kliknij dowolny klawisz aby zacząć", True, pygame.color.THECOLORS["white"])
-        self.game.screen.blit(text_surface, (40, 300))
+        self.play_button.update(self.game.screen)

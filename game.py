@@ -3,9 +3,11 @@ import random
 from main_menu import MainMenu
 from end_screen import EndScreen
 from results_screen import ResultsScreen
+from car import PlayerCar, EnemyCar1, EnemyCar2, EnemyCar3
+from hitbox import RectangleHitbox, CircleHitbox
+from obstacle import Obstacle
+from vector import Vector
 from game_settings import GameSettings
-from car import PlayerCar, EnemyCar
-from hitbox import RectangleHitbox
 
 class GameState():
     main_menu = 0
@@ -27,7 +29,7 @@ class Map:
         self.hitbox = pygame.image.load(hitbox_filename).convert()
         self.background = pygame.image.load(track_filename).convert()
         self.overlay = pygame.image.load(overlay_filename).convert_alpha()
-        self.dimensions = image_rect = pygame.Rect(0, 0, 1920, 576)
+        self.dimensions = image_rect = pygame.Rect(0, 0, 1920, 1080)
 
     def is_point_on_track(self, vec):
         rect = self.hitbox.get_rect()
@@ -38,7 +40,6 @@ class Map:
 
     def draw_background(self):
         self.screen.blit(self.background, self.dimensions)
-        # RectangleHitbox(100, 100, 0, 40, 30).draw(self.screen)
 
     def draw_overlay(self):
         self.screen.blit(self.overlay, self.dimensions)
@@ -74,26 +75,31 @@ class Game:
         self.state = GameState.main_menu
 
         self.map = Map(self.screen, "assets/maps/map-01/track.png", "assets/maps/map-01/overlay.png", "assets/maps/map-01/hitbox.png")
-        import math
         self.progress_rectangles = [
-            RectangleHitbox(600, 100, 0, 60, 160),
-            RectangleHitbox(400, 360, 0, 60, 160),
-            RectangleHitbox(135, 135, math.pi / 4, 160, 60),
+            RectangleHitbox(1200, 150, 0, 300, 200),
+            RectangleHitbox(200, 650, 0, 400, 500),
+            RectangleHitbox(1750, 400, 0, 250, 200),
         ]
-
         self.music = pygame.mixer.music
+        obstacle_texture = pygame.image.load("./assets/plama_oleju.png").convert_alpha()
+        self.obstacles = [
+            Obstacle(self, Vector(1000, 200), obstacle_texture),
+            Obstacle(self, Vector(1200, 140), obstacle_texture),
+        ]
 
         self.show_main()
 
     def init_cars(self):
         self.cars = []
-        self.cars.append(PlayerCar(self, self.sprites, 0.1, 0.98))
-        self.cars.append(EnemyCar(self, self.sprites, 0.1, 0.98))
+        self.cars.append(PlayerCar(self, self.sprites, 0.1, 0.99))
+        self.cars.append(EnemyCar1(self, self.sprites, 0.1, 0.99))
+        self.cars.append(EnemyCar2(self, self.sprites, 0.1, 0.99))
+        self.cars.append(EnemyCar3(self, self.sprites, 0.1, 0.99))
 
         for car in self.cars:
             car.map = self.map
-            car.x = 500
-            car.y = 500
+            car.x = 460
+            car.y = 460
             car.okrazenie = 0
             car.track_progress = 0
 
@@ -107,7 +113,7 @@ class Game:
         while self.running:
             self.mainloop()
             a = self.clock.tick(60)
-            print(a)
+            # print(a)
         pygame.quit()
 
     def open_settings(self):
@@ -160,11 +166,19 @@ class Game:
                     if event.key == pygame.K_r:
                         self.end_race()
 
+            for obstacle in self.obstacles:
+                obstacle.draw()
+
             for car in self.cars:
                 car.update()
                 car.draw()
 
-                if self.progress_rectangles[car.track_progress].check_hit(self.screen, car.position):
+                for obstacle in self.obstacles:
+                    if car.spin <= 0 and obstacle.collides(car.position) and car.velocity.length() > 5:
+                        car.spin = 16*2
+                        car.reduce_speed(0.1)
+
+                if self.progress_rectangles[car.track_progress].check_hit(car.position):
                     car.track_progress += 1
                     if car.track_progress == len(self.progress_rectangles):
                         car.okrazenie += 1

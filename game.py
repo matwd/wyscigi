@@ -60,7 +60,7 @@ class Game:
             print("brak wyjścia audio")
             self.sound = False
             
-        self.real_screen = pygame.display.set_mode([1920, 1080], pygame.RESIZABLE)
+        self.real_screen = pygame.display.set_mode([1440, 810], pygame.RESIZABLE)
 
         self.screen = pygame.Surface([1920, 1080])
 

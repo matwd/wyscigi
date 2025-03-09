@@ -63,6 +63,8 @@ class Game:
 
         self.screen = pygame.Surface([1920, 1080])
 
+        self.font = pygame.freetype.SysFont(pygame.freetype.get_default_font(), 40)
+
         self.sprites = [pygame.image.load(f"assets/car-sprites/car-01/{i:>04}.png").convert_alpha() for i in range(1, 17)]
         self.clock = pygame.time.Clock()
 
@@ -143,6 +145,12 @@ class Game:
 
         self.state = GameState.main_menu
 
+    def ms_to_sec(self, ms):
+        ms = int(ms)
+        seconds = ms // 1000
+        ms = ms % 1000
+        return f"{seconds}.{ms}"
+
     def mainloop(self):
         events = pygame.event.get()
 
@@ -172,9 +180,11 @@ class Game:
                         if car.okrazenie == 3 and isinstance(car, PlayerCar):
                             self.end_race()
 
-            self.time += 60 / 1000
             self.map.draw_overlay()
 
+            self.time += 1000 / 60
+            text_surface, ract = self.font.render(self.ms_to_sec(self.time), pygame.color.THECOLORS["white"])
+            self.screen.blit(text_surface, (self.screen.get_width() - 100 - ract.width, 100))
             # for i in self.progress_rectangles:
                 # i.draw(self.screen)
 

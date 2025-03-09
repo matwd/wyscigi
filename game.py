@@ -1,5 +1,6 @@
 import pygame
 import random
+import itertools
 from main_menu import MainMenu
 from end_screen import EndScreen
 from results_screen import ResultsScreen
@@ -169,22 +170,7 @@ class Game:
             for obstacle in self.obstacles:
                 obstacle.draw()
 
-            for car in self.cars:
-                car.update()
-                car.draw()
-
-                for obstacle in self.obstacles:
-                    if car.spin <= 0 and obstacle.collides(car.position) and car.velocity.length() > 5:
-                        car.spin = 16*2
-                        car.reduce_speed(0.1)
-
-                if self.progress_rectangles[car.track_progress].check_hit(car.position):
-                    car.track_progress += 1
-                    if car.track_progress == len(self.progress_rectangles):
-                        car.okrazenie += 1
-                        car.track_progress = 0
-                        if car.okrazenie == 3 and isinstance(car, PlayerCar):
-                            self.end_race()
+            self.update_cars()
 
             self.map.draw_overlay()
 
@@ -214,3 +200,34 @@ class Game:
                     self.running = False
             if event.type == pygame.QUIT:
                 self.running = False
+
+    def update_cars(self):
+        self.cars.sort(key=lambda x: x.position.y)
+        for car in self.cars:
+            car.update()
+            car.draw()
+
+            for obstacle in self.obstacles:
+                if car.spin <= 0 and obstacle.collides(car.position) and car.velocity.length() > 5:
+                    car.spin = 16*2
+                    car.reduce_speed(0.1)
+
+            if self.progress_rectangles[car.track_progress].check_hit(car.position):
+                car.track_progress += 1
+                if car.track_progress == len(self.progress_rectangles):
+                    car.okrazenie += 1
+                    car.track_progress = 0
+                    if car.okrazenie == 3 and isinstance(car, PlayerCar):
+                        self.end_race()
+
+
+        for car1, car2 in itertools.combinations(self.cars, 2):
+            intersecting = False
+            for point in car2.hitbox.get_points() + (car2.position,):
+                if car1.hitbox.check_hit(point):
+                    intersecting = True
+            if intersecting:
+                diff = car1.position - car2.position
+                car1.position += diff * 0.05
+                car2.position += -diff * 0.05
+

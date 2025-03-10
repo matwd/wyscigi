@@ -64,9 +64,11 @@ class Game:
             print("brak wyjścia audio")
             self.sound = False
 
-        self.real_screen = pygame.display.set_mode([1920, 1080], pygame.RESIZABLE)
+        self.real_screen = pygame.display.set_mode([1440, 810], pygame.RESIZABLE)
 
         self.screen = pygame.Surface([1920, 1080])
+
+        self.font = pygame.freetype.SysFont(pygame.freetype.get_default_font(), 40)
 
         self.sprites = [pygame.image.load(f"assets/car-sprites/car-01/{i:>04}.png").convert_alpha() for i in range(1, 17)]
         self.sprites = [pygame.transform.scale(s, (128, 128)) for s in self.sprites]
@@ -117,6 +119,7 @@ class Game:
         self.running = True
         while self.running:
             self.mainloop()
+
             a = self.clock.tick(60)
             print(a)
         pygame.quit()
@@ -139,7 +142,7 @@ class Game:
         self.state = GameState.race
 
     def end_race(self):
-        self.time = random.randint(2000, 5000) / 100
+        # self.time = random.randint(2000, 5000) / 100
         self.state = GameState.end_screen
 
     def show_result(self):
@@ -155,6 +158,12 @@ class Game:
             self.music.play(-1)
 
         self.state = GameState.main_menu
+
+    def ms_to_sec(self, ms):
+        ms = int(ms)
+        seconds = ms // 1000
+        ms = ms % 1000
+        return f"{seconds}.{ms}"
 
     def mainloop(self):
         events = pygame.event.get()
@@ -180,6 +189,9 @@ class Game:
 
             self.map.draw_overlay()
 
+            self.time += 1000 / 60
+            text_surface, ract = self.font.render(self.ms_to_sec(self.time), pygame.color.THECOLORS["white"])
+            self.screen.blit(text_surface, (self.screen.get_width() - 100 - ract.width, 100))
             # for i in self.progress_rectangles:
                 # i.draw(self.screen)
 

@@ -1,6 +1,7 @@
 import pygame
 import random
 import itertools
+from os import path
 from main_menu import MainMenu
 from end_screen import EndScreen
 from results_screen import ResultsScreen
@@ -25,12 +26,14 @@ class Map:
     Klasa odpowiedzialna za rysowanie toru gry i zapytania dotyczące
     kolizji z torem
     """
-    def __init__(self, screen, track_filename, overlay_filename, hitbox_filename):
+    def __init__(self, screen):
         self.screen = screen
-        self.hitbox = pygame.image.load(hitbox_filename).convert()
-        self.background = pygame.image.load(track_filename).convert()
-        self.overlay = pygame.image.load(overlay_filename).convert_alpha()
         self.dimensions = image_rect = pygame.Rect(0, 0, 1920, 1080)
+
+    def load_from_directory(self, map_directory):
+        self.hitbox = pygame.image.load(path.join(map_directory, "hitbox.png")).convert()
+        self.background = pygame.image.load(path.join(map_directory, "track.png")).convert()
+        self.overlay = pygame.image.load(path.join(map_directory, "overlay.png")).convert_alpha()
 
     def is_point_on_track(self, vec):
         rect = self.hitbox.get_rect()
@@ -40,10 +43,10 @@ class Map:
         return False
 
     def draw_background(self):
-        self.screen.blit(self.background, self.dimensions)
+        self.screen.blit(self.background, (0, 0))
 
     def draw_overlay(self):
-        self.screen.blit(self.overlay, self.dimensions)
+        self.screen.blit(self.overlay, (0, 0))
 
 class Game:
     """
@@ -60,12 +63,13 @@ class Game:
         except pygame.error:
             print("brak wyjścia audio")
             self.sound = False
-            
+
         self.real_screen = pygame.display.set_mode([1920, 1080], pygame.RESIZABLE)
 
         self.screen = pygame.Surface([1920, 1080])
 
         self.sprites = [pygame.image.load(f"assets/car-sprites/car-01/{i:>04}.png").convert_alpha() for i in range(1, 17)]
+        self.sprites = [pygame.transform.scale(s, (128, 128)) for s in self.sprites]
         self.clock = pygame.time.Clock()
 
         self.time = 0
@@ -75,7 +79,7 @@ class Game:
         self.game_settings = GameSettings(self)
         self.state = GameState.main_menu
 
-        self.map = Map(self.screen, "assets/maps/map-01/track.png", "assets/maps/map-01/overlay.png", "assets/maps/map-01/hitbox.png")
+        self.map = Map(self.screen)
         self.progress_rectangles = [
             RectangleHitbox(1200, 150, 0, 300, 200),
             RectangleHitbox(200, 650, 0, 400, 500),
@@ -114,7 +118,7 @@ class Game:
         while self.running:
             self.mainloop()
             a = self.clock.tick(60)
-            # print(a)
+            print(a)
         pygame.quit()
 
     def open_settings(self):
@@ -122,6 +126,8 @@ class Game:
 
     def start_race(self, map, player_car_sprites):
         self.init_cars()
+
+        self.map.load_from_directory("assets/maps/map-01")
 
         if self.sound:
             self.music.stop()
@@ -141,7 +147,7 @@ class Game:
 
     def show_main(self):
         if self.sound:
-                
+
             self.music.stop()
             self.music.unload()
 
@@ -221,13 +227,19 @@ class Game:
                         self.end_race()
 
 
+        return
         for car1, car2 in itertools.combinations(self.cars, 2):
             intersecting = False
             for point in car2.hitbox.get_points() + (car2.position,):
                 if car1.hitbox.check_hit(point):
                     intersecting = True
+            for point in car1.hitbox.get_points() + (car1.position,):
+                if car2.hitbox.check_hit(point):
+                    intersecting = True
             if intersecting:
                 diff = car1.position - car2.position
                 car1.position += diff * 0.05
                 car2.position += -diff * 0.05
+                car1.reduce_speed(0.9)
+                car2.reduce_speed(0.9)
 

@@ -4,6 +4,17 @@ import pygame
 import random
 from hitbox import RectangleHitbox, CircleHitbox
 
+map1_points = [
+    CircleHitbox(520, 500, 100),
+    CircleHitbox(700, 170, 100),
+    CircleHitbox(1600, 170, 100),
+    CircleHitbox(1750, 740, 100),
+    CircleHitbox(1050, 450, 100),
+    CircleHitbox(850, 750, 100),
+    CircleHitbox(200, 780, 100),
+    CircleHitbox(200, 550, 100),
+]
+
 class Car:
     def __init__(self, game, sprites, poslizg, tarcie):
         self.game = game
@@ -94,8 +105,8 @@ class Car:
 
     def draw(self):
         rect = self.sprites[0].get_rect()
-        image_rect = pygame.Rect(self.x-rect.width, self.y-rect.width+random.randint(-1, 1), 256, 256)
-        self.game.screen.blit(pygame.transform.scale(self.sprites[self.direction], (128, 128)), image_rect)
+        image_rect = pygame.Rect(self.x-rect.width/2, self.y-rect.width/2+random.randint(-1, 1), 256, 256)
+        self.game.screen.blit(self.sprites[self.direction], image_rect)
 
         pygame.draw.rect(self.game.screen, (0, 0, 0), (self.x - 50, self.y - 50, 100, 10), border_radius=4)
         pygame.draw.rect(self.game.screen, (0, 0, 240), (self.x - 50, self.y - 50, self.nitro, 10), border_radius=4)
@@ -187,16 +198,7 @@ class EnemyCar(Car):
 class EnemyCar1(EnemyCar):
     def __init__(self, *args):
         super().__init__(*args)
-        self.points = [
-            CircleHitbox(520, 500, 100),
-            CircleHitbox(700, 170, 100),
-            CircleHitbox(1600, 170, 100),
-            CircleHitbox(1750, 740, 100),
-            CircleHitbox(1050, 450, 100),
-            CircleHitbox(850, 750, 100),
-            CircleHitbox(200, 780, 100),
-            CircleHitbox(200, 550, 100),
-        ]
+        self.points = map1_points
         self.next_target = 0
 
     def update(self):
@@ -272,16 +274,7 @@ class EnemyCar2(EnemyCar):
 class EnemyCar3(EnemyCar):
     def __init__(self, *args):
         super().__init__(*args)
-        self.points = [
-            CircleHitbox(520, 500, 100),
-            CircleHitbox(700, 170, 100),
-            CircleHitbox(1600, 170, 100),
-            CircleHitbox(1750, 740, 100),
-            CircleHitbox(1050, 450, 100),
-            CircleHitbox(850, 750, 100),
-            CircleHitbox(200, 780, 100),
-            CircleHitbox(200, 550, 100),
-        ]
+        self.points = map1_points
         self.next_target = 0
 
     def update(self):
@@ -291,10 +284,19 @@ class EnemyCar3(EnemyCar):
         target = self.points[self.next_target].position
 
         player = filter(lambda x: isinstance(x, PlayerCar), self.game.cars).__iter__().__next__()
-        if (player.position - self.position).length() < 200:
+        to_player_vector = player.position - self.position
+        try_to_hit_player = False
+        # print(player.velocity.length(), to_player_vector, to_player_vector.length())
+        if player.velocity.length() > 3:
+            if to_player_vector.length() < 200 and self.direction_vector.scalar_product(player) > 0:
+                try_to_hit_player = True
+            elif to_player_vector.length() < 50:
+                try_to_hit_player = True
+
+        if try_to_hit_player:
             possible_position = player.position + player.direction_vector.rotate(math.pi / 2) * 40
-            # CircleHitbox(*possible_position, 10).draw(self.game.screen)
-            target = possible_position
+            if self.map.is_point_on_track(possible_position):
+                target = possible_position
 
         self.turn_to_target(target)
 
@@ -305,5 +307,6 @@ class EnemyCar3(EnemyCar):
 
     def draw(self):
         super().draw()
+        # CircleHitbox(*self.position, 10).draw(self.game.screen)
         # for d in self.points:
             # d.draw(self.game.screen)

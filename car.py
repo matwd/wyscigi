@@ -3,17 +3,16 @@ import math
 import pygame
 import random
 from hitbox import RectangleHitbox, CircleHitbox
+from obstacle import Obstacle
 
-map1_points = [
-    CircleHitbox(520, 500, 100),
-    CircleHitbox(700, 170, 100),
-    CircleHitbox(1600, 170, 100),
-    CircleHitbox(1750, 740, 100),
-    CircleHitbox(1050, 450, 100),
-    CircleHitbox(850, 750, 100),
-    CircleHitbox(200, 780, 100),
-    CircleHitbox(200, 550, 100),
-]
+class PowerUp:
+    def __init__(self, sprite):
+        self.sprite = sprite
+
+    def use_on_car(self, car):
+        pass
+
+
 
 class Car:
     def __init__(self, game, sprites, poslizg, tarcie):
@@ -28,6 +27,7 @@ class Car:
         self.spin = 0
         self.nitro = 100
         self.hitbox = RectangleHitbox(self.x, self.y, 0, 80, 36)
+        self.has_banana_peel = True
         self.update_direction()
 
     @property
@@ -158,6 +158,10 @@ class Car:
         # point4 = self.position + Vector(25 * math.cos(point4_rotation), 15 * math.sin(point4_rotation))
         # self.points = [point1, point2, point3, point4]
 
+    def leave_obstacle(self):
+        banana_texture = pygame.image.load("./assets/banana.png").convert_alpha()
+        self.game.map.dissapearing_obstacles.append(Obstacle(self.game, self.position - self.direction_vector.normalize() * 60, banana_texture))
+
 class PlayerCar(Car):
     def update(self):
         super().update()
@@ -176,6 +180,10 @@ class PlayerCar(Car):
             if self.nitro >= 10:
                 self.nitro -= 5
                 self.accelerate(0.6)
+        if keys[pygame.K_z]:
+            if self.has_banana_peel:
+                self.leave_obstacle()
+                self.has_banana_peel = False
 
 class EnemyCar(Car):
     def turn_to_target(self, target: Vector):
@@ -198,18 +206,18 @@ class EnemyCar(Car):
 class EnemyCar1(EnemyCar):
     def __init__(self, *args):
         super().__init__(*args)
-        self.points = map1_points
+        self.waypoints = self.game.map.waypoints
         self.next_target = 0
 
     def update(self):
         super().update()
 
         # target = Vector(*pygame.mouse.get_pos())
-        target = self.points[self.next_target]
+        target = self.waypoints[self.next_target]
         self.turn_to_target(target.position)
 
         if target.check_hit(self.position):
-            self.next_target = (self.next_target + 1) % len(self.points)
+            self.next_target = (self.next_target + 1) % len(self.waypoints)
 
     def draw(self):
         super().draw()
@@ -274,14 +282,14 @@ class EnemyCar2(EnemyCar):
 class EnemyCar3(EnemyCar):
     def __init__(self, *args):
         super().__init__(*args)
-        self.points = map1_points
+        self.waypoints = self.game.map.waypoints
         self.next_target = 0
 
     def update(self):
         super().update()
 
         # target = Vector(*pygame.mouse.get_pos())
-        target = self.points[self.next_target].position
+        target = self.waypoints[self.next_target].position
 
         player = filter(lambda x: isinstance(x, PlayerCar), self.game.cars).__iter__().__next__()
         to_player_vector = player.position - self.position
@@ -300,9 +308,9 @@ class EnemyCar3(EnemyCar):
 
         self.turn_to_target(target)
 
-        for index, point in enumerate(self.points):
+        for index, point in enumerate(self.waypoints):
             if point.check_hit(self.position):
-                self.next_target = (index + 1) % len(self.points)
+                self.next_target = (index + 1) % len(self.waypoints)
 
 
     def draw(self):

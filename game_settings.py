@@ -67,7 +67,7 @@ class GameSettings:
                 if self.play_button.checkForInput(mouse_pos):
                     print("Wybrane auto:",self.chosen_car)
                     print("Wybrana mapa:",self.chosen_map)
-                    self.game.start_race(0, 0)
+                    self.game.start_race(self.chosen_map, self.chosen_car)
                 for index, car_btn in enumerate(self.car_btns,start=1):
                     if car_btn.checkForInput(mouse_pos):
                         self.chosen_car=index

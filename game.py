@@ -1,6 +1,7 @@
 import pygame
 import random
 import itertools
+import json
 from os import path
 from main_menu import MainMenu
 from end_screen import EndScreen
@@ -23,17 +24,44 @@ debug = True
 # Wszystkie obroty są w radianach
 class Map:
     """
-    Klasa odpowiedzialna za rysowanie toru gry i zapytania dotyczące
-    kolizji z torem
+    Klasa odpowiedzialna za rysowanie toru gry, zapytania dotyczące
+    kolizji z torem, oraz obiekty znajdące się na torze np. przeszkody itp
     """
     def __init__(self, screen):
+        """
+        Inicjalizacja obiekty Map, ale bez ładowania tekstur i hitboxów.
+        Te muszą zostać załadowane metodą load_from_directory
+        """
         self.screen = screen
         self.dimensions = image_rect = pygame.Rect(0, 0, 1920, 1080)
+        self.hitbox = None
+        self.background = None
+        self.overlay = None
+        self.waypoints = []
+        self.obstacles = []
+        self.dissapearing_obstacles = []
 
-    def load_from_directory(self, map_directory):
+    def load_from_directory(self, map_directory, level):
+        """
+        Matoda ładuje dane o danym torze.
+        Argument map_directory to ścieżka do folderu z danymi toru.
+        Przykład: "assets/maps/map-01"
+        """
         self.hitbox = pygame.image.load(path.join(map_directory, "hitbox.png")).convert()
         self.background = pygame.image.load(path.join(map_directory, "track.png")).convert()
         self.overlay = pygame.image.load(path.join(map_directory, "overlay.png")).convert_alpha()
+        obstacle_texture = pygame.image.load("./assets/plama_oleju.png").convert_alpha()
+        with open(path.join(map_directory, "data.json")) as file:
+            data = json.load(file)
+
+            # Ładuje punkty do przejechania dla przeciwników
+            for waypoint_cords in data["waypoints"]:
+                self.waypoints.append(CircleHitbox(*waypoint_cords))
+
+            # Ładuje punkty do przejechania dla przeciwników
+            random.shuffle(data["obstacles"])
+            for obstacle_cords in data["obstacles"][:2+level]:
+                self.obstacles.append(Obstacle(self, Vector(*obstacle_cords), obstacle_texture))
 
     def is_point_on_track(self, vec):
         rect = self.hitbox.get_rect()
@@ -44,6 +72,8 @@ class Map:
 
     def draw_background(self):
         self.screen.blit(self.background, (0, 0))
+        for obstacle in self.obstacles + self.dissapearing_obstacles:
+            obstacle.draw()
 
     def draw_overlay(self):
         self.screen.blit(self.overlay, (0, 0))
@@ -64,7 +94,7 @@ class Game:
             print("brak wyjścia audio")
             self.sound = False
 
-        self.real_screen = pygame.display.set_mode([1440, 810], pygame.RESIZABLE)
+        self.real_screen = pygame.display.set_mode([1920, 1080], pygame.RESIZABLE)
 
         self.screen = pygame.Surface([1920, 1080])
 
@@ -88,11 +118,6 @@ class Game:
             RectangleHitbox(1750, 400, 0, 250, 200),
         ]
         self.music = pygame.mixer.music
-        obstacle_texture = pygame.image.load("./assets/plama_oleju.png").convert_alpha()
-        self.obstacles = [
-            Obstacle(self, Vector(1000, 200), obstacle_texture),
-            Obstacle(self, Vector(1200, 140), obstacle_texture),
-        ]
 
         self.show_main()
 
@@ -121,7 +146,7 @@ class Game:
             self.mainloop()
 
             a = self.clock.tick(60)
-            print(a)
+            # print(a)
         pygame.quit()
 
     def open_settings(self):
@@ -130,7 +155,7 @@ class Game:
     def start_race(self, map, player_car_sprites):
         self.init_cars()
 
-        self.map.load_from_directory("assets/maps/map-01")
+        self.map.load_from_directory(f"assets/maps/map-{map:02}", map)
 
         if self.sound:
             self.music.stop()
@@ -181,9 +206,8 @@ class Game:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
                         self.end_race()
-
-            for obstacle in self.obstacles:
-                obstacle.draw()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    print(event.pos)
 
             self.update_cars()
 
@@ -208,7 +232,7 @@ class Game:
             self.game_settings.update(events)
             self.game_settings.draw()
 
-        self.real_screen.blit(pygame.transform.scale(self.screen, self.real_screen.get_size()), (0, 0, *self.real_screen.get_size()))
+        self.real_screen.blit(pygame.transform.scale(self.screen, self.real_screen.get_size()), (0, 0))
         pygame.display.flip()
 
         # zamykanie gry
@@ -225,10 +249,17 @@ class Game:
             car.update()
             car.draw()
 
-            for obstacle in self.obstacles:
+            for obstacle in self.map.obstacles:
                 if car.spin <= 0 and obstacle.collides(car.position) and car.velocity.length() > 5:
                     car.spin = 16*2
                     car.reduce_speed(0.1)
+
+            for obstacle in self.map.dissapearing_obstacles:
+                if car.spin <= 0 and obstacle.collides(car.position) and car.velocity.length() > 5:
+                    car.spin = 16*2
+                    car.reduce_speed(0.1)
+                    self.map.dissapearing_obstacles.remove(obstacle)
+                    break
 
             if self.progress_rectangles[car.track_progress].check_hit(car.position):
                 car.track_progress += 1
@@ -239,7 +270,6 @@ class Game:
                         self.end_race()
 
 
-        return
         for car1, car2 in itertools.combinations(self.cars, 2):
             intersecting = False
             for point in car2.hitbox.get_points() + (car2.position,):

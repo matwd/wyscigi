@@ -112,11 +112,11 @@ class Car:
         pygame.draw.rect(self.game.screen, (0, 0, 240), (self.x - 50, self.y - 50, self.nitro, 10), border_radius=4)
 
         self.hitbox.pos = self.position.copy()
-        # self.hitbox.draw(self.game.screen)
-        # pygame.draw.line(self.game.screen, (255, 0, 255), tuple(self.position), tuple(self.position + self.velocity * 20))
-        # pygame.draw.circle(self.game.screen, pygame.Color('blue'), (self.x, self.y), 3)
-        # for p in self.points:
-            # pygame.draw.circle(self.game.screen, pygame.Color('red'), tuple(p), 3)
+
+    def draw_debug(self):
+        self.hitbox.draw(self.game.screen)
+        pygame.draw.circle(self.game.screen, pygame.Color('red'), (self.x, self.y), 3)
+
 
     def turn_left(self):
         if self.rotation_cooldown <= 0 and self.spin <= 0:

@@ -226,8 +226,6 @@ class Game:
             self.time += 1000 / 60
             text_surface, ract = self.font.render(self.ms_to_sec(self.time), pygame.color.THECOLORS["white"])
             self.screen.blit(text_surface, (self.screen.get_width() - 100 - ract.width, 100))
-            # for i in self.progress_rectangles:
-                # i.draw(self.screen)
 
 
         elif self.state == GameState.end_screen:
@@ -253,11 +251,13 @@ class Game:
             if event.type == pygame.QUIT:
                 self.running = False
 
-    def draw_debug():
+    def draw_debug(self):
         for car in self.cars:
             car.draw_debug()
-        for d in self.waypoints:
-            d.draw(self.game.screen)
+        for i in self.progress_rectangles:
+            i.draw(self.screen)
+        for d in self.map.waypoints:
+            d.draw(self.screen)
 
     def update_cars(self):
         self.cars.sort(key=lambda x: x.position.y)

@@ -11,6 +11,7 @@ from hitbox import RectangleHitbox, CircleHitbox
 from obstacle import Obstacle
 from vector import Vector
 from game_settings import GameSettings
+from barrier import Barrier
 
 class GameState():
     main_menu = 0
@@ -21,7 +22,6 @@ class GameState():
 
 debug = True
 
-# Wszystkie obroty są w radianach
 class Map:
     """
     Klasa odpowiedzialna za rysowanie toru gry, zapytania dotyczące
@@ -40,6 +40,7 @@ class Map:
         self.waypoints = []
         self.obstacles = []
         self.dissapearing_obstacles = []
+        self.barrier = Barrier(1310, 710, 1.2)
 
     def load_from_directory(self, map_directory, level):
         """
@@ -65,6 +66,12 @@ class Map:
 
     def is_point_on_track(self, vec):
         rect = self.hitbox.get_rect()
+
+        # sprawdź czy nie uderzono w szlaban
+        if self.barrier.check_hit(vec):
+            return False
+
+        # sprawdź czy punkt jest na mapie, jeżeli tak to sprawdź czy jest też na torze
         if 0 < vec.x < rect.width and 0 < vec.y < rect.height:
             return self.hitbox.get_at((int(vec.x), int(vec.y))) == (0, 0, 0, 255)
 
@@ -77,6 +84,8 @@ class Map:
 
     def draw_overlay(self):
         self.screen.blit(self.overlay, (0, 0))
+        if self.barrier:
+            self.barrier.draw(self.screen)
 
 class Game:
     """
@@ -201,6 +210,7 @@ class Game:
 
         elif self.state == GameState.race:
             self.map.draw_background()
+            self.map.barrier.update()
 
             for event in events:
                 if event.type == pygame.KEYDOWN:
@@ -242,6 +252,12 @@ class Game:
                     self.running = False
             if event.type == pygame.QUIT:
                 self.running = False
+
+    def draw_debug():
+        for car in self.cars:
+            car.draw_debug()
+        for d in self.waypoints:
+            d.draw(self.game.screen)
 
     def update_cars(self):
         self.cars.sort(key=lambda x: x.position.y)

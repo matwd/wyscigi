@@ -221,8 +221,6 @@ class EnemyCar1(EnemyCar):
 
     def draw(self):
         super().draw()
-        # for d in self.points:
-            # d.draw(self.game.screen)
 
 class EnemyCar2(EnemyCar):
     def __init__(self, *args):

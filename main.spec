@@ -5,7 +5,7 @@ added_files = [
          ]
 a = Analysis(
     ['main.py'],
-    pathex=['.venv/lib64/python3.13/site-packages/'],
+    pathex=['.venv/Lib/site-packages/'],
     binaries=[],
     datas=added_files,
     hiddenimports=['pygame.freetype'],

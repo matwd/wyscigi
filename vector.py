@@ -49,3 +49,7 @@ class Vector:
         "Obrócenie wektora wokół punktu zaczepienia"
         s, c = math.sin(rotation), math.cos(rotation)
         return Vector(c * self.x - s * self.y, c * self.y + s * self.x)
+
+    def copy(self):
+        return Vector(self.x, self.y)
+

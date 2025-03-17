@@ -24,12 +24,14 @@ class Map:
     Klasa odpowiedzialna za rysowanie toru gry i zapytania dotyczące
     kolizji z torem
     """
-    def __init__(self, screen, track_filename, overlay_filename, hitbox_filename):
+    def __init__(self, screen, track_filename, overlay_filename, hitbox_filename, starting_x, starting_y):
         self.screen = screen
         self.hitbox = pygame.image.load(hitbox_filename).convert()
         self.background = pygame.image.load(track_filename).convert()
         self.overlay = pygame.image.load(overlay_filename).convert_alpha()
         self.dimensions = image_rect = pygame.Rect(0, 0, 1920, 1080)
+        self.starting_x = starting_x
+        self.starting_y = starting_y
 
     def is_point_on_track(self, vec):
         rect = self.hitbox.get_rect()
@@ -76,12 +78,22 @@ class Game:
         self.game_settings = GameSettings(self)
         self.state = GameState.main_menu
 
-        self.map = Map(self.screen, "assets/maps/map-01/track.png", "assets/maps/map-01/overlay.png", "assets/maps/map-01/hitbox.png")
-        self.progress_rectangles = [
+        self.map_1 = Map(self.screen, "assets/maps/map-01/track.png", "assets/maps/map-01/overlay.png", "assets/maps/map-01/hitbox.png",460,460)
+        self.map_2 = Map(self.screen, "assets/maps/map-02/track.png", "assets/maps/map-02/overlay.png", "assets/maps/map-02/hitbox.png",225,375)
+
+        self.progress_rectangles_1 = [
             RectangleHitbox(1200, 150, 0, 300, 200),
             RectangleHitbox(200, 650, 0, 400, 500),
             RectangleHitbox(1750, 400, 0, 250, 200),
         ]
+        self.progress_rectangles_2 = [
+            RectangleHitbox(1200, 150, 0, 300, 200),
+            RectangleHitbox(200, 650, 0, 400, 500),
+            RectangleHitbox(1750, 400, 0, 250, 200),
+        ]
+
+        self.map = None
+        self.progress_rectangles = []
         self.music = pygame.mixer.music
         obstacle_texture = pygame.image.load("./assets/plama_oleju.png").convert_alpha()
         self.obstacles = [
@@ -100,8 +112,8 @@ class Game:
 
         for car in self.cars:
             car.map = self.map
-            car.x = 460
-            car.y = 460
+            car.x = self.map.starting_x
+            car.y = self.map.starting_y
             car.okrazenie = 0
             car.track_progress = 0
 
@@ -123,6 +135,13 @@ class Game:
         self.state = GameState.game_settings
 
     def start_race(self, map, player_car_sprites):
+        if map == 1:
+            self.map = self.map_1
+            self.progress_rectangles = self.progress_rectangles_1
+        elif map == 2:
+            self.map = self.map_2
+            self.progress_rectangles = self.progress_rectangles_2
+
         self.init_cars()
 
         if self.sound:

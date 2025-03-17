@@ -25,11 +25,13 @@ class ResultsScreen:
             ranking = json.load(file)
 
         if self.max_page == -1:
+            # przekomiczna imitacja paginacji
             self.max_page = len(ranking) // 8
 
         ranking = sorted(ranking, key=lambda x: x["time"])
         
         for i, result in enumerate(ranking):
+            # paginacji ciąg dalszy
             if i < self.page * 8:
                 continue
             if i >= (self.page + 1) * 8:

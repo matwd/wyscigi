@@ -11,8 +11,10 @@ class EndScreen:
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_BACKSPACE:
+                    # usuwa ostatni znak jeśli klinie się backspace
                     self.name = self.name[:-1]
                 elif event.key == pygame.K_RETURN:
+                    # sprawdza czy nazwa nie jest pusta i jeśli nie jest to zapisuje wynik do pliku
                     if self.name == "":
                         return
 
@@ -22,6 +24,7 @@ class EndScreen:
                         with open("results.json", "r") as file:
                             results = json.load(file)
                     except:
+                        # jeśli nie ma pliku to go tworzy z pustym arrayem json
                         with open("results.json", "w") as file:
                             file.write("[]")
 

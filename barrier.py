@@ -41,7 +41,6 @@ class Barrier:
 
     def draw(self, screen):
         screen.blit(self.sprites[self.frame], (self.drawing_x, self.drawing_y))
-        self.hitbox.draw(screen)
 
     def check_hit(self, point):
         """Sprawdzanie kolizji z szlabanem"""

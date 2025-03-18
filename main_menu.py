@@ -2,6 +2,9 @@ import pygame
 from button import Button
 
 class MainMenu:
+    """
+    Klasa odpowiedzialna za menu główne gry
+    """
     def __init__(self, game):
         
         self.game = game

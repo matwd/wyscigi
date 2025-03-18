@@ -27,6 +27,7 @@ class Map:
     Klasa odpowiedzialna za rysowanie toru gry, zapytania dotyczące
     kolizji z torem, oraz obiekty znajdące się na torze np. przeszkody itp
     """
+    # def __init__(self, screen, track_filename, overlay_filename, hitbox_filename, starting_x, starting_y):
     def __init__(self, screen):
         """
         Inicjalizacja obiekty Map, ale bez ładowania tekstur i hitboxów.
@@ -41,6 +42,8 @@ class Map:
         self.obstacles = []
         self.dissapearing_obstacles = []
         self.barrier = Barrier(1310, 710, 1.2)
+        self.starting_x = 440
+        self.starting_y = 440
 
     def load_from_directory(self, map_directory, level):
         """
@@ -126,6 +129,7 @@ class Game:
             RectangleHitbox(200, 650, 0, 400, 500),
             RectangleHitbox(1750, 400, 0, 250, 200),
         ]
+
         self.music = pygame.mixer.music
 
         self.show_main()
@@ -139,8 +143,8 @@ class Game:
 
         for car in self.cars:
             car.map = self.map
-            car.x = 460
-            car.y = 460
+            car.x = self.map.starting_x
+            car.y = self.map.starting_y
             car.okrazenie = 0
             car.track_progress = 0
 

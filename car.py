@@ -3,6 +3,16 @@ import math
 import pygame
 import random
 from hitbox import RectangleHitbox, CircleHitbox
+from obstacle import Obstacle
+
+class PowerUp:
+    def __init__(self, sprite):
+        self.sprite = sprite
+
+    def use_on_car(self, car):
+        pass
+
+
 
 class Car:
     def __init__(self, game, sprites, poslizg, tarcie):
@@ -17,6 +27,7 @@ class Car:
         self.spin = 0
         self.nitro = 100
         self.hitbox = RectangleHitbox(self.x, self.y, 0, 80, 36)
+        self.has_banana_peel = True
         self.update_direction()
 
     @property
@@ -94,18 +105,18 @@ class Car:
 
     def draw(self):
         rect = self.sprites[0].get_rect()
-        image_rect = pygame.Rect(self.x-rect.width, self.y-rect.width+random.randint(-1, 1), 256, 256)
-        self.game.screen.blit(pygame.transform.scale(self.sprites[self.direction], (128, 128)), image_rect)
+        image_rect = pygame.Rect(self.x-rect.width/2, self.y-rect.width/2+random.randint(-1, 1), 256, 256)
+        self.game.screen.blit(self.sprites[self.direction], image_rect)
 
         pygame.draw.rect(self.game.screen, (0, 0, 0), (self.x - 50, self.y - 50, 100, 10), border_radius=4)
         pygame.draw.rect(self.game.screen, (0, 0, 240), (self.x - 50, self.y - 50, self.nitro, 10), border_radius=4)
 
         self.hitbox.pos = self.position.copy()
-        # self.hitbox.draw(self.game.screen)
-        # pygame.draw.line(self.game.screen, (255, 0, 255), tuple(self.position), tuple(self.position + self.velocity * 20))
-        # pygame.draw.circle(self.game.screen, pygame.Color('blue'), (self.x, self.y), 3)
-        # for p in self.points:
-            # pygame.draw.circle(self.game.screen, pygame.Color('red'), tuple(p), 3)
+
+    def draw_debug(self):
+        self.hitbox.draw(self.game.screen)
+        pygame.draw.circle(self.game.screen, pygame.Color('red'), (self.x, self.y), 3)
+
 
     def turn_left(self):
         if self.rotation_cooldown <= 0 and self.spin <= 0:
@@ -147,6 +158,10 @@ class Car:
         # point4 = self.position + Vector(25 * math.cos(point4_rotation), 15 * math.sin(point4_rotation))
         # self.points = [point1, point2, point3, point4]
 
+    def leave_obstacle(self):
+        banana_texture = pygame.image.load("./assets/banana.png").convert_alpha()
+        self.game.map.dissapearing_obstacles.append(Obstacle(self.game, self.position - self.direction_vector.normalize() * 60, banana_texture))
+
 class PlayerCar(Car):
     def update(self):
         super().update()
@@ -165,6 +180,10 @@ class PlayerCar(Car):
             if self.nitro >= 10:
                 self.nitro -= 5
                 self.accelerate(0.6)
+        if keys[pygame.K_z]:
+            if self.has_banana_peel:
+                self.leave_obstacle()
+                self.has_banana_peel = False
 
 class EnemyCar(Car):
     def turn_to_target(self, target: Vector):
@@ -187,32 +206,21 @@ class EnemyCar(Car):
 class EnemyCar1(EnemyCar):
     def __init__(self, *args):
         super().__init__(*args)
-        self.points = [
-            CircleHitbox(520, 500, 100),
-            CircleHitbox(700, 170, 100),
-            CircleHitbox(1600, 170, 100),
-            CircleHitbox(1750, 740, 100),
-            CircleHitbox(1050, 450, 100),
-            CircleHitbox(850, 750, 100),
-            CircleHitbox(200, 780, 100),
-            CircleHitbox(200, 550, 100),
-        ]
+        self.waypoints = self.game.map.waypoints
         self.next_target = 0
 
     def update(self):
         super().update()
 
         # target = Vector(*pygame.mouse.get_pos())
-        target = self.points[self.next_target]
+        target = self.waypoints[self.next_target]
         self.turn_to_target(target.position)
 
         if target.check_hit(self.position):
-            self.next_target = (self.next_target + 1) % len(self.points)
+            self.next_target = (self.next_target + 1) % len(self.waypoints)
 
     def draw(self):
         super().draw()
-        # for d in self.points:
-            # d.draw(self.game.screen)
 
 class EnemyCar2(EnemyCar):
     def __init__(self, *args):
@@ -272,38 +280,39 @@ class EnemyCar2(EnemyCar):
 class EnemyCar3(EnemyCar):
     def __init__(self, *args):
         super().__init__(*args)
-        self.points = [
-            CircleHitbox(520, 500, 100),
-            CircleHitbox(700, 170, 100),
-            CircleHitbox(1600, 170, 100),
-            CircleHitbox(1750, 740, 100),
-            CircleHitbox(1050, 450, 100),
-            CircleHitbox(850, 750, 100),
-            CircleHitbox(200, 780, 100),
-            CircleHitbox(200, 550, 100),
-        ]
+        self.waypoints = self.game.map.waypoints
         self.next_target = 0
 
     def update(self):
         super().update()
 
         # target = Vector(*pygame.mouse.get_pos())
-        target = self.points[self.next_target].position
+        target = self.waypoints[self.next_target].position
 
         player = filter(lambda x: isinstance(x, PlayerCar), self.game.cars).__iter__().__next__()
-        if (player.position - self.position).length() < 200:
+        to_player_vector = player.position - self.position
+        try_to_hit_player = False
+        # print(player.velocity.length(), to_player_vector, to_player_vector.length())
+        if player.velocity.length() > 3:
+            if to_player_vector.length() < 200 and self.direction_vector.scalar_product(player) > 0:
+                try_to_hit_player = True
+            elif to_player_vector.length() < 50:
+                try_to_hit_player = True
+
+        if try_to_hit_player:
             possible_position = player.position + player.direction_vector.rotate(math.pi / 2) * 40
-            # CircleHitbox(*possible_position, 10).draw(self.game.screen)
-            target = possible_position
+            if self.map.is_point_on_track(possible_position):
+                target = possible_position
 
         self.turn_to_target(target)
 
-        for index, point in enumerate(self.points):
+        for index, point in enumerate(self.waypoints):
             if point.check_hit(self.position):
-                self.next_target = (index + 1) % len(self.points)
+                self.next_target = (index + 1) % len(self.waypoints)
 
 
     def draw(self):
         super().draw()
+        # CircleHitbox(*self.position, 10).draw(self.game.screen)
         # for d in self.points:
             # d.draw(self.game.screen)

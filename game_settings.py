@@ -80,6 +80,8 @@ class GameSettings:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # Rozpoczęcie gry wraz z wybranymi ustawieniami po kliknięciu przycisku 
                 if self.play_button.checkForInput(mouse_pos):
+                    print("Wybrane auto:",self.chosen_car)
+                    print("Wybrana mapa:",self.chosen_map)
                     self.game.start_race(self.chosen_map, self.chosen_car)
 
                 # Zmiana wybranego auta po kliknięciu przycisku

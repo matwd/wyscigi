@@ -114,8 +114,14 @@ class Game:
 
         self.font = pygame.freetype.SysFont(pygame.freetype.get_default_font(), 40)
 
-        self.sprites = [pygame.image.load(f"assets/car-sprites/car-01/{i:>04}.png").convert_alpha() for i in range(1, 17)]
-        self.sprites = [pygame.transform.scale(s, (128, 128)) for s in self.sprites]
+        self.sprites = [
+            [pygame.image.load(f"assets/car-sprites/car-01/{i:>04}.png") for i in range(1, 17)],
+            [pygame.image.load(f"assets/car-sprites/car-02/{i:>04}.png") for i in range(1, 17)],
+            [pygame.image.load(f"assets/car-sprites/car-03/{i:>04}.png") for i in range(1, 17)],
+            [pygame.image.load(f"assets/car-sprites/car-04/{i:>04}.png") for i in range(1, 17)],
+            [pygame.image.load(f"assets/car-sprites/car-05/{i:>04}.png") for i in range(1, 17)]
+        ]
+        self.sprites = [[pygame.transform.scale(s, (128, 128)).convert_alpha(self.screen) for s in car_sprites] for car_sprites in self.sprites]
         self.clock = pygame.time.Clock()
 
         self.time = 0
@@ -137,12 +143,12 @@ class Game:
 
         self.show_main()
 
-    def init_cars(self):
+    def init_cars(self, player_car_sprite):
         self.cars = []
-        self.cars.append(PlayerCar(self, self.sprites, 0.1, 0.99))
-        self.cars.append(EnemyCar1(self, self.sprites, 0.1, 0.99))
-        self.cars.append(EnemyCar2(self, self.sprites, 0.1, 0.99))
-        self.cars.append(EnemyCar3(self, self.sprites, 0.1, 0.99))
+        self.cars.append(PlayerCar(self, self.sprites.pop(player_car_sprite), 0.1, 0.99))
+        self.cars.append(EnemyCar1(self, self.sprites.pop(), 0.1, 0.99))
+        self.cars.append(EnemyCar2(self, self.sprites.pop(), 0.1, 0.99))
+        self.cars.append(EnemyCar3(self, self.sprites.pop(), 0.1, 0.99))
 
         for car in self.cars:
             car.map = self.map
@@ -168,8 +174,8 @@ class Game:
     def open_settings(self):
         self.state = GameState.game_settings
 
-    def start_race(self, map, player_car_sprites):
-        self.init_cars()
+    def start_race(self, map, chosen_car):
+        self.init_cars(chosen_car)
 
         self.map.load_from_directory(f"assets/maps/map-{map:02}", map)
 

@@ -9,6 +9,7 @@ from results_screen import ResultsScreen
 from car import PlayerCar, EnemyCar1, EnemyCar2, EnemyCar3
 from hitbox import RectangleHitbox, CircleHitbox
 from obstacle import Obstacle
+from snowfall import Snowfall
 from vector import Vector
 from game_settings import GameSettings
 from barrier import Barrier
@@ -22,6 +23,7 @@ class GameState():
 
 debug = True
 
+# Wszystkie obroty są w radianach
 class Map:
     """
     Klasa odpowiedzialna za rysowanie toru gry, zapytania dotyczące
@@ -106,7 +108,7 @@ class Game:
             print("brak wyjścia audio")
             self.sound = False
 
-        self.real_screen = pygame.display.set_mode([1920, 1080], pygame.RESIZABLE)
+        self.real_screen = pygame.display.set_mode([1600, 900], pygame.RESIZABLE)
 
         self.screen = pygame.Surface([1920, 1080])
 
@@ -120,6 +122,7 @@ class Game:
         self.main_menu = MainMenu(self)
         self.end_screen = EndScreen(self)
         self.results_screen = ResultsScreen(self)
+        self.snowfall = Snowfall(-10, 20, 1.25, 2, 1920, 1080)
         self.game_settings = GameSettings(self)
         self.state = GameState.main_menu
 
@@ -227,9 +230,13 @@ class Game:
 
             self.map.draw_overlay()
 
+            self.snowfall.snowfall(self.screen, random.random() - 0.5)
+
             self.time += 1000 / 60
             text_surface, ract = self.font.render(self.ms_to_sec(self.time), pygame.color.THECOLORS["white"])
             self.screen.blit(text_surface, (self.screen.get_width() - 100 - ract.width, 100))
+            # for i in self.progress_rectangles:
+                # i.draw(self.screen)
 
 
         elif self.state == GameState.end_screen:

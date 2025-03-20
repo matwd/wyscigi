@@ -122,6 +122,8 @@ class Game:
         self.results_screen = ResultsScreen(self)
         self.game_settings = GameSettings(self)
 
+        self.selected_map = 0
+
         self.map = Map(self.screen)
         self.progress_rectangles = [
             RectangleHitbox(1200, 150, 0, 300, 200),
@@ -132,7 +134,6 @@ class Game:
         self.music = pygame.mixer.music
 
         self.show_main()
-        # self.show_result()
 
     def init_cars(self):
         self.cars = []

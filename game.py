@@ -121,7 +121,6 @@ class Game:
         self.end_screen = EndScreen(self)
         self.results_screen = ResultsScreen(self)
         self.game_settings = GameSettings(self)
-        self.state = GameState.main_menu
 
         self.map = Map(self.screen)
         self.progress_rectangles = [
@@ -133,6 +132,7 @@ class Game:
         self.music = pygame.mixer.music
 
         self.show_main()
+        # self.show_result()
 
     def init_cars(self):
         self.cars = []

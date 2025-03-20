@@ -4,7 +4,8 @@ import json
 class ResultsScreen:
     def __init__(self, game):
         self.game = game
-        self.font = pygame.freetype.SysFont(pygame.freetype.get_default_font(), 40)
+        self.fontBig = pygame.font.Font("assets/font/8-BIT WONDER.TTF", 100)
+        self.font = pygame.font.Font("assets/font/8-BIT_WONDER.ttf", 40)
         self.page = 0
         self.max_page = -1
 
@@ -30,6 +31,9 @@ class ResultsScreen:
 
         ranking = sorted(ranking, key=lambda x: x["time"])
         
+        test_surface = self.fontBig.render("Results", True, (255, 255, 255))
+        self.game.screen.blit(test_surface, (40, 40))
+
         for i, result in enumerate(ranking):
             # paginacji ciąg dalszy
             if i < self.page * 8:
@@ -37,5 +41,5 @@ class ResultsScreen:
             if i >= (self.page + 1) * 8:
                 break
 
-            text_surface, ract = self.font.render(f"{result['name']}: {float(result['time']):.2f}", pygame.color.THECOLORS["white"], size=0)
-            self.game.screen.blit(text_surface, (40, 40 + (50 * (i - self.page * 8))))
+            text_surface = self.font.render(f"{result['name']}: {float(result['time']):.2f}", True, (255, 255, 255))
+            self.game.screen.blit(text_surface, (40, 200 + i * 40))

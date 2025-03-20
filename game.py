@@ -130,7 +130,8 @@ class Game:
         self.results_screen = ResultsScreen(self)
         self.snowfall = Snowfall(-10, 20, 1.25, 2, 1920, 1080)
         self.game_settings = GameSettings(self)
-        self.state = GameState.main_menu
+
+        self.selected_map = 0
 
         self.map = Map(self.screen)
         self.progress_rectangles = [

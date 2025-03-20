@@ -175,7 +175,7 @@ class Game:
         self.state = GameState.game_settings
 
     def start_race(self, map, chosen_car):
-        self.init_cars(chosen_car)
+        self.init_cars(chosen_car-1)
 
         self.map.load_from_directory(f"assets/maps/map-{map:02}", map)
 

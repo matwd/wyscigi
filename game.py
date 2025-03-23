@@ -79,9 +79,10 @@ class Game:
     def init_cars(self, player_car_sprite):
         self.cars = []
         self.cars.append(PlayerCar(self, self.sprites.pop(player_car_sprite), 0.1, 0.99))
-        self.cars.append(EnemyCar1(self, self.sprites.pop(), 0.1, 0.99, self.map.waypoints))
-        self.cars.append(EnemyCar2(self, self.sprites.pop(), 0.1, 0.99, self.map.waypoints))
-        self.cars.append(EnemyCar3(self, self.sprites.pop(), 0.1, 0.99, self.map.waypoints))
+
+        self.cars.append(EnemyCar1(self, self.sprites.pop(random.choice(range(len(self.sprites)))), 0.1, 0.99, self.map.waypoints))
+        self.cars.append(EnemyCar2(self, self.sprites.pop(random.choice(range(len(self.sprites)))), 0.1, 0.99, self.map.waypoints))
+        self.cars.append(EnemyCar3(self, self.sprites.pop(random.choice(range(len(self.sprites)))), 0.1, 0.99, self.map.waypoints))
 
         for car in self.cars:
             car.map = self.map
@@ -108,7 +109,7 @@ class Game:
         self.state = GameState.game_settings
 
     def start_race(self, map, chosen_car):
-        self.init_cars(chosen_car)
+        self.init_cars(chosen_car-1)
 
         self.map.load_from_directory(f"assets/maps/map-{map:02}", map)
 

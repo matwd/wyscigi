@@ -78,11 +78,11 @@ class Game:
 
     def init_cars(self, player_car_sprite):
         self.cars = []
-        self.cars.append(PlayerCar(self, self.sprites.pop(player_car_sprite), 0.1, 0.99))
+        self.cars.append(PlayerCar(self, self.sprites.pop(player_car_sprite)))
 
-        self.cars.append(EnemyCar1(self, self.sprites.pop(random.choice(range(len(self.sprites)))), 0.1, 0.99, self.map.waypoints))
-        self.cars.append(EnemyCar2(self, self.sprites.pop(random.choice(range(len(self.sprites)))), 0.1, 0.99, self.map.waypoints))
-        self.cars.append(EnemyCar3(self, self.sprites.pop(random.choice(range(len(self.sprites)))), 0.1, 0.99, self.map.waypoints))
+        self.cars.append(EnemyCar1(self, self.sprites.pop(random.choice(range(len(self.sprites)))), self.map.waypoints))
+        self.cars.append(EnemyCar2(self, self.sprites.pop(random.choice(range(len(self.sprites)))), self.map.waypoints))
+        self.cars.append(EnemyCar3(self, self.sprites.pop(random.choice(range(len(self.sprites)))), self.map.waypoints))
 
         for car in self.cars:
             car.map = self.map

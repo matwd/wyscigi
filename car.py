@@ -186,6 +186,20 @@ class PlayerCar(Car):
                 self.has_banana_peel = False
 
 class EnemyCar(Car):
+    def __init__(self, game, sprites, poslizg, tarcie, waypoints):
+        super().__init__(game, sprites, poslizg, tarcie)
+        self.waypoints = waypoints
+        self.next_target = 0
+
+    def update(self):
+        super().update()
+        for i, w in enumerate(self.waypoints):
+            if w.check_hit(self.position):
+                self.next_target = (i + 1) % len(self.waypoints)
+            target = self.waypoints[self.next_target]
+        # if target.check_hit(self.position):
+        #     self.next_target = (self.next_target + 1) % len(self.waypoints)
+
     def turn_to_target(self, target: Vector):
         wanted_direction = target - self.position
         angle_to_target = math.atan2(wanted_direction.y, wanted_direction.x) + (math.tau/32)
@@ -204,20 +218,12 @@ class EnemyCar(Car):
                 self.accelerate(0.2)
 
 class EnemyCar1(EnemyCar):
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.waypoints = self.game.map.waypoints
-        self.next_target = 0
-
     def update(self):
         super().update()
 
         # target = Vector(*pygame.mouse.get_pos())
         target = self.waypoints[self.next_target]
         self.turn_to_target(target.position)
-
-        if target.check_hit(self.position):
-            self.next_target = (self.next_target + 1) % len(self.waypoints)
 
     def draw(self):
         super().draw()
@@ -229,6 +235,25 @@ class EnemyCar2(EnemyCar):
 
     def update(self):
         super().update()
+
+        target = self.waypoints[self.next_target]
+        wanted_direction = target.position - self.position
+        angle_to_target = math.atan2(wanted_direction.y, wanted_direction.x) + (math.tau/32)
+        target_rotation = int(angle_to_target // (math.tau/16)) % 16
+        needed_rotation = (self.direction - target_rotation) % 16
+
+        print(needed_rotation)
+        if needed_rotation in (0, 1, 2, 3, 15, 14, 13):
+            pass
+        elif needed_rotation < 8:
+            self.turn_left()
+            self.accelerate(0.2)
+            return
+        elif needed_rotation > 8:
+            self.turn_right()
+            self.accelerate(0.2)
+            return
+
 
         directions = [
             (self.direction + off) / 16 * math.tau for off in range(-2, 3)
@@ -278,10 +303,6 @@ class EnemyCar2(EnemyCar):
 
 
 class EnemyCar3(EnemyCar):
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.waypoints = self.game.map.waypoints
-        self.next_target = 0
 
     def update(self):
         super().update()
@@ -306,9 +327,10 @@ class EnemyCar3(EnemyCar):
 
         self.turn_to_target(target)
 
-        for index, point in enumerate(self.waypoints):
-            if point.check_hit(self.position):
-                self.next_target = (index + 1) % len(self.waypoints)
+        target = self.waypoints[self.next_target]
+        # for index, point in enumerate(self.waypoints):
+        #     if point.check_hit(self.position):
+        #         self.next_target = (index + 1) % len(self.waypoints)
 
 
     def draw(self):

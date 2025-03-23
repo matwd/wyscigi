@@ -68,6 +68,32 @@ class Map:
 
         return False
 
+    def get_ground_params(self, vec) -> ("tarcie", "starowność"):
+        normal = (0.1, 0.99)
+        ice = (0.2, 0.996)
+        sand = (0.05, 0.99)
+        rect = self.hitbox.get_rect()
+
+        if 0 < vec.x < rect.width and 0 < vec.y < rect.height:
+            hitbox_color = self.hitbox.get_at((int(vec.x), int(vec.y)))
+
+            # kolor czarny oznacza normalną trasę
+            if hitbox_color == (0, 0, 0, 255):
+                return normal
+
+            # kolor biały oznacza teren poza trasą, ale nie obsługujemy kolizji
+            # w tym miejscu kodu, więc parametry terenu zostają normalne
+            if hitbox_color == (255, 255, 255, 255):
+                return normal
+
+            # kolor niebieski to lód (mniejsze tarcie i sterowność)
+            if hitbox_color == (0, 0, 255, 255):
+                print("on ice")
+                return ice
+
+        print("gets here")
+        return normal
+
     def draw_background(self):
         self.screen.blit(self.background, (0, 0))
         for obstacle in self.obstacles + self.dissapearing_obstacles:

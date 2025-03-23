@@ -15,11 +15,12 @@ class PowerUp:
 
 
 class Car:
-    def __init__(self, game, sprites, poslizg, tarcie):
+    def __init__(self, game, sprites):
         self.game = game
         self.sprites = sprites
-        self.poslizg = poslizg
-        self.tarcie = tarcie
+        # poślizg i tarcie są aktualizowane później zależnie od terenu po którym jedzie samochów
+        self.poslizg = 0
+        self.tarcie = 1
         self.position = Vector()
         self.velocity = Vector(0, 0)
         self.rotation_cooldown = 0
@@ -93,9 +94,10 @@ class Car:
             if point4_outside:
                 self.turn_left()
 
-
-        # if not self.map.is_point_on_track(self.position):
-            # self.position = old_position
+        ground_params = self.map.get_ground_params(self.position)
+        print(ground_params)
+        self.poslizg = ground_params[0]
+        self.tarcie = ground_params[1]
 
         if self.nitro < 100:
             self.nitro += 0.1
@@ -186,8 +188,8 @@ class PlayerCar(Car):
                 self.has_banana_peel = False
 
 class EnemyCar(Car):
-    def __init__(self, game, sprites, poslizg, tarcie, waypoints):
-        super().__init__(game, sprites, poslizg, tarcie)
+    def __init__(self, game, sprites, waypoints):
+        super().__init__(game, sprites)
         self.waypoints = waypoints
         self.next_target = 0
 
@@ -242,7 +244,6 @@ class EnemyCar2(EnemyCar):
         target_rotation = int(angle_to_target // (math.tau/16)) % 16
         needed_rotation = (self.direction - target_rotation) % 16
 
-        print(needed_rotation)
         if needed_rotation in (0, 1, 2, 3, 15, 14, 13):
             pass
         elif needed_rotation < 8:

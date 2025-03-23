@@ -62,7 +62,7 @@ class Map:
 
         # sprawdź czy punkt jest na mapie, jeżeli tak to sprawdź czy jest też na torze
         if 0 < vec.x < rect.width and 0 < vec.y < rect.height:
-            return self.hitbox.get_at((int(vec.x), int(vec.y))) == (0, 0, 0, 255)
+            return not self.hitbox.get_at((int(vec.x), int(vec.y))) == (255, 255, 255, 255)
 
         return False
 

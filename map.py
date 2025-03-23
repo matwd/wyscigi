@@ -27,7 +27,7 @@ class Map:
         self.waypoints = []
         self.obstacles = []
         self.dissapearing_obstacles = []
-        self.barrier = Barrier(1310, 710, 1.2)
+        self.barrier = None
         self.starting_x = 440
         self.starting_y = 440
 
@@ -52,6 +52,8 @@ class Map:
             random.shuffle(data["obstacles"])
             for obstacle_cords in data["obstacles"][:2+level]:
                 self.obstacles.append(Obstacle(self, Vector(*obstacle_cords), obstacle_texture))
+
+            self.barrier = Barrier(*data["barrier"])
 
     def is_point_on_track(self, vec):
         rect = self.hitbox.get_rect()

@@ -37,7 +37,7 @@ class GameSettings:
 
         self.map_1_img = pygame.transform.scale(pygame.image.load("assets/menu_miniatures/map1.png"),[400,225])
         self.map_2_img = pygame.transform.scale(pygame.image.load("assets/menu_miniatures/map2.png"),[400,225])
-        self.map_3_img = pygame.transform.scale(pygame.image.load("assets/menu_miniatures/map2.png"),[400,225])
+        self.map_3_img = pygame.transform.scale(pygame.image.load("assets/menu_miniatures/map3.png"),[400,225])
 
         self.map_imgs = [self.map_1_img,self.map_2_img,self.map_3_img]
 
@@ -63,7 +63,7 @@ class GameSettings:
 
 
         self.map_1_btn = Button(pos=(380,875),text_var="Map Name", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
-        self.map_2_btn = Button(pos=(960,875),text_var="Map Name", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
+        self.map_2_btn = Button(pos=(960,875),text_var="Petrol City", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
         self.map_3_btn = Button(pos=(1540,875),text_var="Map Name", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
 
         self.chosen_map = 1

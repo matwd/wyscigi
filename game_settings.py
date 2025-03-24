@@ -120,11 +120,35 @@ class GameSettings:
                             self.chosen_car=index
                             self.car_frame_index = 6
                             self.last_frame_time = pygame.time.get_ticks()
+
+                # Zmiana wybranego auta po kliknięciu na obrazek
+
+                for index, car_img in enumerate(self.car_imgs, start=1):
+                    # Sprawdzamy czy kliknięcie miało miejsce wewnątrz obrazka
+                    rect = car_img.get_rect(center=(320 + ((index-1) * 320), 300))
+                    position = [round(mouse_pos[0] / self.game.real_screen.get_size()[0] * 1920),
+                                round(mouse_pos[1] / self.game.real_screen.get_size()[1] * 1080)]
+                    if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top,rect.bottom):
+                        # Jeśli tak, robimy to samo co w przypadku kliknięcia przycisku
+                        self.chosen_car = index
+                        self.car_frame_index = 6
+                        self.last_frame_time = pygame.time.get_ticks()
                 
                 # Zmiana wybranej mapy po kliknięciu przycisku
                 for index, map_btn in enumerate(self.map_btns,start=1):
                     if map_btn.checkForInput(mouse_pos):
                         self.chosen_map=index
+
+                # Zmiana wybranej mapy po kliknięciu na obrazek
+
+                for index, map_img in enumerate(self.map_imgs, start=1):
+                    # Sprawdzamy czy kliknięcie miało miejsce wewnątrz obrazka
+                    rect = map_img.get_rect(center=(380+((index-1)*580),725))
+                    position = [round(mouse_pos[0] / self.game.real_screen.get_size()[0] * 1920),
+                                round(mouse_pos[1] / self.game.real_screen.get_size()[1] * 1080)]
+                    if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top,rect.bottom):
+                        # Jeśli tak, robimy to samo co w przypadku kliknięcia przycisku
+                        self.chosen_map = index
                 
 
     def draw(self):

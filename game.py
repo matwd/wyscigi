@@ -40,6 +40,9 @@ class Game:
             print("brak wyjścia audio")
             self.sound = False
 
+        icon = pygame.image.load('assets\logo.ico') 
+        pygame.display.set_icon(icon)
+
         self.real_screen = pygame.display.set_mode([1920, 1080], pygame.RESIZABLE)
 
         self.screen = pygame.Surface([1920, 1080])

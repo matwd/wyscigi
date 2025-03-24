@@ -184,11 +184,19 @@ class Game:
                 self.lap_times[player.okrazenie] += 1000 / 60
 
             for i, time in enumerate(self.lap_times):
-                text_surface = self.font.render(self.ms_to_sec(time), True, (255, 255, 255))
-                # self.screen.blit(text_surface, (self.screen.get_width() - 100 - text_surface.get_width(), 150 + i * 50))
-                # self.screen.blit(text_surface, (self.screen.get_width() / 3 * i - text_surface.get_width(), 50))
+                time_color = (123, 123, 123)
+                if (i == player.okrazenie):
+                    time_color = (255, 255, 255)
 
-            print(self.lap_times)
+                time_surface = self.font.render(self.ms_to_sec(time), True, time_color)
+                
+                time_width = time_surface.get_width()
+                screen_width = self.screen.get_width()
+
+                space_for_time_text = 150
+
+                self.screen.blit(time_surface, (screen_width / 2 - time_width / 2 + space_for_time_text * (i - 1), 25))
+
 
             # self.draw_debug()
 

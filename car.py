@@ -95,7 +95,7 @@ class Car:
                 self.turn_left()
 
         ground_params = self.map.get_ground_params(self.position)
-        print(ground_params)
+        # print(ground_params)
         self.poslizg = ground_params[0]
         self.tarcie = ground_params[1]
 

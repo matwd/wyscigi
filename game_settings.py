@@ -12,8 +12,8 @@ class GameSettings:
         self.last_frame_time = pygame.time.get_ticks()
 
         self.game = game
-        self.font_large = pygame.font.Font("assets/font/8-BIT WONDER.TTF", 60)
-        self.font_normal = pygame.font.Font("assets/font/8-BIT WONDER.TTF", 30)
+        self.font_large = pygame.font.Font("assets/font/Jersey10.ttf", 100)
+        self.font_normal = pygame.font.Font("assets/font/Jersey10.ttf", 50)
 
         # Obrazki aut oraz ich lista
 
@@ -46,11 +46,11 @@ class GameSettings:
         self.car_pick_text = self.font_large.render("CHOOSE YOUR CAR", True, (255,255,255))
         self.car_pick_rect = self.car_pick_text.get_rect(center=(960, 100))
 
-        self.car_1_btn = Button(pos=(320,470),text_var="CAR 1", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
-        self.car_2_btn = Button(pos=(640,470),text_var="CAR 2", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
-        self.car_3_btn = Button(pos=(960,470),text_var="CAR 3", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
-        self.car_4_btn = Button(pos=(1280,470),text_var="CAR 4", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
-        self.car_5_btn = Button(pos=(1600,470),text_var="CAR 5", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
+        self.car_1_btn = Button(pos=(320,470),text_var="Orange Overtaker", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
+        self.car_2_btn = Button(pos=(640,470),text_var="Cobalt Crusher", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
+        self.car_3_btn = Button(pos=(960,470),text_var="Crimson Conqueror", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
+        self.car_4_btn = Button(pos=(1280,470),text_var="Verdant Vandal", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
+        self.car_5_btn = Button(pos=(1600,470),text_var="Graphite Gladiator", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
 
         self.car_btns = [self.car_1_btn,self.car_2_btn,self.car_3_btn,self.car_4_btn,self.car_5_btn]
 
@@ -130,9 +130,10 @@ class GameSettings:
                                 round(mouse_pos[1] / self.game.real_screen.get_size()[1] * 1080)]
                     if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top,rect.bottom):
                         # Jeśli tak, robimy to samo co w przypadku kliknięcia przycisku
-                        self.chosen_car = index
-                        self.car_frame_index = 6
-                        self.last_frame_time = pygame.time.get_ticks()
+                        if self.chosen_car != index:
+                            self.chosen_car = index
+                            self.car_frame_index = 6
+                            self.last_frame_time = pygame.time.get_ticks()
                 
                 # Zmiana wybranej mapy po kliknięciu przycisku
                 for index, map_btn in enumerate(self.map_btns,start=1):

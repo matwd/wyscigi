@@ -44,7 +44,8 @@ class Game:
 
         self.screen = pygame.Surface([1920, 1080])
 
-        self.font = pygame.freetype.SysFont(pygame.freetype.get_default_font(), 40)
+        # self.font = pygame.freetype.SysFont(pygame.freetype.get_default_font(), 40)
+        self.font = pygame.font.Font("assets/font/Jersey10.ttf", 40)
 
         self.sprites = [
             [pygame.image.load(f"assets/car-sprites/car-01/{i:>04}.png") for i in range(1, 17)],
@@ -62,6 +63,7 @@ class Game:
         self.results_screen = ResultsScreen(self)
         self.snowfall = Snowfall(-10, 20, 1.25, 2, 1920, 1080)
         self.game_settings = GameSettings(self)
+        self.lap_times = [0, 0, 0]
 
         self.selected_map = 0
 
@@ -178,8 +180,31 @@ class Game:
             self.snowfall.snowfall(self.screen, random.random() - 0.5)
 
             self.time += 1000 / 60
-            text_surface, ract = self.font.render(self.ms_to_sec(self.time), pygame.color.THECOLORS["white"])
-            self.screen.blit(text_surface, (self.screen.get_width() - 100 - ract.width, 100))
+            text_surface = self.font.render(self.ms_to_sec(self.time), True, (255, 255, 255))
+            # self.screen.blit(text_surface, (self.screen.get_width() - 100 - text_surface.get_width(), 100))
+
+            player = filter(lambda x: isinstance(x, PlayerCar), self.cars).__iter__().__next__()
+
+            if player.okrazenie < 3:
+                self.lap_times[player.okrazenie] += 1000 / 60
+
+            for i, time in enumerate(self.lap_times):
+                time_color = (123, 123, 123)
+                if (i == player.okrazenie):
+                    time_color = (255, 255, 255)
+
+                time_surface = self.font.render(self.ms_to_sec(time), True, time_color)
+                
+                time_width = time_surface.get_width()
+                screen_width = self.screen.get_width()
+
+                space_for_time_text = 150
+
+                self.screen.blit(time_surface, (screen_width / 2 - time_width / 2 + space_for_time_text * (i - 1), 25))
+
+
+            # self.draw_debug()
+
             # for i in self.progress_rectangles:
                 # i.draw(self.screen)
 
@@ -238,6 +263,10 @@ class Game:
                 if car.track_progress == len(self.progress_rectangles):
                     car.okrazenie += 1
                     car.track_progress = 0
+
+                    # if isinstance(car, PlayerCar):
+                    #     self.lap_times.append(self.time - sum(self.lap_times))
+
                     if car.okrazenie == 3 and isinstance(car, PlayerCar):
                         self.end_race()
 

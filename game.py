@@ -95,11 +95,6 @@ class Game:
         self.selected_map = 0
 
         self.map = Map(self.screen)
-        self.progress_rectangles = [
-            RectangleHitbox(1200, 150, 0, 300, 200),
-            RectangleHitbox(200, 650, 0, 400, 500),
-            RectangleHitbox(1750, 400, 0, 250, 200),
-        ]
 
         self.music = pygame.mixer.music
 
@@ -143,10 +138,11 @@ class Game:
         self.state = GameState.game_settings
 
     def start_race(self, map, chosen_car):
+        self.map.load_from_directory(f"assets/maps/map-{map:02}", map)
+
         self.init_cars(chosen_car-1)
         self.lap_times = [0, 0, 0]
 
-        self.map.load_from_directory(f"assets/maps/map-{map:02}", map)
 
         if self.sound:
             self.music.stop()
@@ -233,9 +229,6 @@ class Game:
 
             # self.draw_debug()
 
-            # for i in self.progress_rectangles:
-                # i.draw(self.screen)
-
 
         elif self.state == GameState.end_screen:
             self.end_screen.update(events)
@@ -263,7 +256,7 @@ class Game:
     def draw_debug(self):
         for car in self.cars:
             car.draw_debug()
-        for i in self.progress_rectangles:
+        for i in self.map.progress_rectangles:
             i.draw(self.screen)
         for d in self.map.waypoints:
             d.draw(self.screen)
@@ -286,9 +279,9 @@ class Game:
                     self.map.dissapearing_obstacles.remove(obstacle)
                     break
 
-            if self.progress_rectangles[car.track_progress].check_hit(car.position):
+            if self.map.progress_rectangles[car.track_progress].check_hit(car.position):
                 car.track_progress += 1
-                if car.track_progress == len(self.progress_rectangles):
+                if car.track_progress == len(self.map.progress_rectangles):
                     car.okrazenie += 1
                     car.track_progress = 0
 

@@ -1,7 +1,7 @@
 import pygame
 from barrier import Barrier
 from os import path
-from hitbox import CircleHitbox
+from hitbox import CircleHitbox, RectangleHitbox
 from vector import Vector
 from obstacle import Obstacle
 import random
@@ -26,6 +26,7 @@ class Map:
         self.overlay = None
         self.waypoints = []
         self.obstacles = []
+        self.progress_rectangles = []
         self.dissapearing_obstacles = []
         self.barrier = None
         self.starting_x = 440
@@ -37,23 +38,37 @@ class Map:
         Argument map_directory to ścieżka do folderu z danymi toru.
         Przykład: "assets/maps/map-01"
         """
+        # ładowanie grafik tła, otoczenia oraz hitboxów
         self.hitbox = pygame.image.load(path.join(map_directory, "hitbox.png")).convert()
         self.background = pygame.image.load(path.join(map_directory, "track.png")).convert()
         self.overlay = pygame.image.load(path.join(map_directory, "overlay.png")).convert_alpha()
         obstacle_texture = pygame.image.load("./assets/plama_oleju.png").convert_alpha()
+
+        # czyszczenie tablic
+        self.waypoints = []
+        self.obstacles = []
+        self.progress_rectangles = []
+        self.dissapearing_obstacles = []
+
+        # pobranie danych z jsona do zmiennej map_data
         with open(path.join(map_directory, "data.json")) as file:
-            data = json.load(file)
+            map_data = json.load(file)
 
-            # Ładuje punkty do przejechania dla przeciwników
-            for waypoint_cords in data["waypoints"]:
-                self.waypoints.append(CircleHitbox(*waypoint_cords))
+        # Ładuje punkty do przejechania dla przeciwników
+        for waypoint_cords in map_data["waypoints"]:
+            self.waypoints.append(CircleHitbox(*waypoint_cords))
 
-            # Ładuje punkty do przejechania dla przeciwników
-            random.shuffle(data["obstacles"])
-            for obstacle_cords in data["obstacles"][:2+level]:
-                self.obstacles.append(Obstacle(self, Vector(*obstacle_cords), obstacle_texture))
+        # Ładuje punkty do przejechania dla przeciwników
+        random.shuffle(map_data["obstacles"])
+        for obstacle_cords in map_data["obstacles"][:2+level]:
+            self.obstacles.append(Obstacle(self, Vector(*obstacle_cords), obstacle_texture))
 
-            self.barrier = Barrier(*data["barrier"])
+        # Ładowanie szlabanu
+        self.barrier = Barrier(*map_data["barrier"])
+
+        # Ładowanie "punktów postępu" sprawdzających czy gracz jedzie poprawnie po torze
+        for rectangle_data in map_data["progress_rectangles"]:
+            self.progress_rectangles.append(RectangleHitbox(*rectangle_data))
 
     def is_point_on_track(self, vec):
         rect = self.hitbox.get_rect()
@@ -88,7 +103,6 @@ class Map:
 
             # kolor niebieski to lód (mniejsze tarcie i sterowność)
             if hitbox_color == (0, 0, 255, 255):
-                print("on ice")
                 return ice
 
         print("gets here")

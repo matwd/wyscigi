@@ -16,11 +16,19 @@ from barrier import Barrier
 from map import Map
 
 class GameState():
+    """
+    Klasa/Enum używany do obsługi obecnego stanu gry
+    """
+    # główne menu
     main_menu = 0
-    race = 1
-    end_screen = 2
-    result_screen = 3
-    game_settings = 4
+    # wybór opcji gry
+    game_settings = 1
+    # trwa wyścig
+    race = 2
+    # zakończenie wyścigu
+    end_screen = 3
+    # ekran z wynikami
+    result_screen = 4
 
 debug = True
 
@@ -33,23 +41,31 @@ class Game:
         pygame.init()
         pygame.font.init()
 
+        # Inicjalizacja dźwięku
         self.sound = True
         try:
             pygame.mixer.init()
         except pygame.error:
+            # jeżeli nie znaleziono głośnika to wyłączamy dźwięk
             print("brak wyjścia audio")
             self.sound = False
 
+        # ustawienie ikony okna
         icon = pygame.image.load('assets/logo.ico') 
         pygame.display.set_icon(icon)
 
+        # otwarcie okna gry
         self.real_screen = pygame.display.set_mode([1920, 1080], pygame.RESIZABLE)
 
+        # Tekstura na którą wszystko jest rysowane
+        # jest potem skalowana do rozmiaru okna gry
         self.screen = pygame.Surface([1920, 1080])
 
-        # self.font = pygame.freetype.SysFont(pygame.freetype.get_default_font(), 40)
+        # inicjalizacja czcionki
         self.font = pygame.font.Font("assets/font/Jersey10.ttf", 40)
 
+        # ładowanie spritów samochodzików z katalogu assets/car-sprites
+        # dla każdego auta ładujemy 16 obrazków z odpowiednigo katalogu
         self.sprites = [
             [pygame.image.load(f"assets/car-sprites/car-01/{i:>04}.png") for i in range(1, 17)],
             [pygame.image.load(f"assets/car-sprites/car-02/{i:>04}.png") for i in range(1, 17)],
@@ -57,25 +73,28 @@ class Game:
             [pygame.image.load(f"assets/car-sprites/car-04/{i:>04}.png") for i in range(1, 17)],
             [pygame.image.load(f"assets/car-sprites/car-05/{i:>04}.png") for i in range(1, 17)]
         ]
-        self.sprites = [[pygame.transform.scale(s, (128, 128)).convert_alpha(self.screen) for s in car_sprites] for car_sprites in self.sprites]
-        self.clock = pygame.time.Clock()
 
+        # skalowanie obrazków do odpowiedniego rozmiaru
+        self.sprites = [[pygame.transform.scale(s, (128, 128)).convert_alpha(self.screen) for s in car_sprites] for car_sprites in self.sprites]
+
+        # utworzenie zegara pozwalającego uzyskać stabilną (w miarę możliwości systemu) liczbę klatek na sekundę
+        # oraz tablice mierzące czas przejechania okrążeń
+        self.clock = pygame.time.Clock()
         self.time = 0
+        self.lap_times = [0, 0, 0]
+
+        # zainicjalizowanie ekranów menu, ustawień wyścigu, końcowego i wyników
         self.main_menu = MainMenu(self)
+        self.game_settings = GameSettings(self)
         self.end_screen = EndScreen(self)
         self.results_screen = ResultsScreen(self)
+
+        # inicjalizacja efektu opadania śniegu
         self.snowfall = Snowfall(-10, 20, 1.25, 2, 1920, 1080)
-        self.game_settings = GameSettings(self)
-        self.lap_times = [0, 0, 0]
 
         self.selected_map = 0
 
         self.map = Map(self.screen)
-        self.progress_rectangles = [
-            RectangleHitbox(1200, 150, 0, 300, 200),
-            RectangleHitbox(200, 650, 0, 400, 500),
-            RectangleHitbox(1750, 400, 0, 250, 200),
-        ]
 
         self.music = pygame.mixer.music
 
@@ -94,10 +113,9 @@ class Game:
         self.cars.append(EnemyCar2(self, sprites.pop(), self.map.waypoints))
         self.cars.append(EnemyCar3(self, sprites.pop(), self.map.waypoints))
 
-        for car in self.cars:
+        for i, car in enumerate(self.cars):
             car.map = self.map
-            car.x = self.map.starting_x
-            car.y = self.map.starting_y
+            car.x, car.y, car.direction = self.map.starting_points[i]
             car.okrazenie = 0
             car.track_progress = 0
 
@@ -119,9 +137,11 @@ class Game:
         self.state = GameState.game_settings
 
     def start_race(self, map, chosen_car):
-        self.init_cars(chosen_car-1)
-
         self.map.load_from_directory(f"assets/maps/map-{map:02}", map)
+
+        self.init_cars(chosen_car-1)
+        self.lap_times = [0, 0, 0]
+
 
         if self.sound:
             self.music.stop()
@@ -208,9 +228,6 @@ class Game:
 
             # self.draw_debug()
 
-            # for i in self.progress_rectangles:
-                # i.draw(self.screen)
-
 
         elif self.state == GameState.end_screen:
             self.end_screen.update(events)
@@ -238,7 +255,7 @@ class Game:
     def draw_debug(self):
         for car in self.cars:
             car.draw_debug()
-        for i in self.progress_rectangles:
+        for i in self.map.progress_rectangles:
             i.draw(self.screen)
         for d in self.map.waypoints:
             d.draw(self.screen)
@@ -261,9 +278,9 @@ class Game:
                     self.map.dissapearing_obstacles.remove(obstacle)
                     break
 
-            if self.progress_rectangles[car.track_progress].check_hit(car.position):
+            if self.map.progress_rectangles[car.track_progress].check_hit(car.position):
                 car.track_progress += 1
-                if car.track_progress == len(self.progress_rectangles):
+                if car.track_progress == len(self.map.progress_rectangles):
                     car.okrazenie += 1
                     car.track_progress = 0
 

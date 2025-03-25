@@ -113,10 +113,9 @@ class Game:
         self.cars.append(EnemyCar2(self, sprites.pop(), self.map.waypoints))
         self.cars.append(EnemyCar3(self, sprites.pop(), self.map.waypoints))
 
-        for car in self.cars:
+        for i, car in enumerate(self.cars):
             car.map = self.map
-            car.x = self.map.starting_x
-            car.y = self.map.starting_y
+            car.x, car.y, car.direction = self.map.starting_points[i]
             car.okrazenie = 0
             car.track_progress = 0
 

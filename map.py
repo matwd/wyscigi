@@ -28,6 +28,7 @@ class Map:
         self.obstacles = []
         self.progress_rectangles = []
         self.dissapearing_obstacles = []
+        self.starting_points = []
         self.barrier = None
         self.starting_x = 440
         self.starting_y = 440
@@ -49,6 +50,7 @@ class Map:
         self.obstacles = []
         self.progress_rectangles = []
         self.dissapearing_obstacles = []
+        self.starting_points = []
 
         # pobranie danych z jsona do zmiennej map_data
         with open(path.join(map_directory, "data.json")) as file:
@@ -69,6 +71,8 @@ class Map:
         # Ładowanie "punktów postępu" sprawdzających czy gracz jedzie poprawnie po torze
         for rectangle_data in map_data["progress_rectangles"]:
             self.progress_rectangles.append(RectangleHitbox(*rectangle_data))
+
+        self.starting_points = map_data["starting_points"]
 
     def is_point_on_track(self, vec):
         rect = self.hitbox.get_rect()
@@ -105,7 +109,6 @@ class Map:
             if hitbox_color == (0, 0, 255, 255):
                 return ice
 
-        print("gets here")
         return normal
 
     def draw_background(self):

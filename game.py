@@ -6,8 +6,7 @@ from os import path
 from main_menu import MainMenu
 from end_screen import EndScreen
 from results_screen import ResultsScreen
-from car import PlayerCar, EnemyCar1, EnemyCar2, EnemyCar3
-from hitbox import RectangleHitbox, CircleHitbox
+from car import PlayerCar, EnemyCar1, EnemyCar2, EnemyCar3, EnemyCar4
 from obstacle import Obstacle
 from snowfall import Snowfall
 from vector import Vector
@@ -112,10 +111,12 @@ class Game:
         self.cars.append(EnemyCar1(self, sprites.pop(), self.map.waypoints))
         self.cars.append(EnemyCar2(self, sprites.pop(), self.map.waypoints))
         self.cars.append(EnemyCar3(self, sprites.pop(), self.map.waypoints))
+        self.cars.append(EnemyCar4(self, sprites.pop(), self.map.waypoints))
 
         for i, car in enumerate(self.cars):
             car.map = self.map
             car.x, car.y, car.direction = self.map.starting_points[i]
+
             car.okrazenie = 0
             car.track_progress = 0
 
@@ -137,6 +138,7 @@ class Game:
         self.state = GameState.game_settings
 
     def start_race(self, map, chosen_car):
+        self.selected_map = map
         self.map.load_from_directory(f"assets/maps/map-{map:02}", map)
 
         self.init_cars(chosen_car-1)
@@ -200,7 +202,8 @@ class Game:
 
             self.map.draw_overlay()
 
-            self.snowfall.snowfall(self.screen, random.random() - 0.5)
+            if self.selected_map == 3:
+                self.snowfall.snowfall(self.screen, random.random() - 0.5)
 
             self.time += 1000 / 60
             text_surface = self.font.render(self.ms_to_sec(self.time), True, (255, 255, 255))
@@ -293,16 +296,23 @@ class Game:
 
         for car1, car2 in itertools.combinations(self.cars, 2):
             intersecting = False
+            if (car1.position - car2.position).length() > 100:
+                # jezeli auta są daleko od siebie to nie sprawdzamy kolizji
+                continue
+            car1_points = car1.hitbox.get_points()
+            car1_points += tuple((car1_points[i] + car1_points[i+1]) / 2 for i in range(-1, 3))
             for point in car2.hitbox.get_points() + (car2.position,):
                 if car1.hitbox.check_hit(point):
                     intersecting = True
-            for point in car1.hitbox.get_points() + (car1.position,):
+            for point in car1_points:
                 if car2.hitbox.check_hit(point):
                     intersecting = True
             if intersecting:
                 diff = car1.position - car2.position
                 car1.position += diff * 0.05
                 car2.position += -diff * 0.05
+                car1.recalculate_hitbox()
+                car2.recalculate_hitbox()
                 car1.reduce_speed(0.9)
                 car2.reduce_speed(0.9)
 

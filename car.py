@@ -25,12 +25,24 @@ class Car:
         self.position = Vector()
         self.velocity = Vector(0, 0)
         self.rotation_cooldown = 0
-        self.direction = 0
+        self._direction = 0
         self.spin = 0
         self.nitro = 100
         self.hitbox = RectangleHitbox(self.x, self.y, 0, 80, 36)
         self.has_banana_peel = True
-        self.update_direction()
+
+    @property
+    def direction(self):
+        return self._direction
+
+    @direction.setter
+    def direction(self, value):
+        # ustawia kierunek (jeden z 16 możliwych) i wektor kierunku
+        self._direction = value
+        # Zapisuje w właściwości degree_vector kierunek jako wektor
+        degree_in_radians = self.direction / 16 * math.tau
+        self.direction_vector = Vector(math.cos(degree_in_radians), math.sin(degree_in_radians))
+        self.recalculate_hitbox()
 
     @property
     def x(self):
@@ -130,7 +142,6 @@ class Car:
             self.rotation_cooldown = 7
             self.direction -= 1
             self.direction %= 16
-            self.update_direction()
 
     def turn_right(self):
         "Skręcanie w prawo"
@@ -139,12 +150,6 @@ class Car:
             self.rotation_cooldown = 7
             self.direction += 1
             self.direction %= 16
-            self.update_direction()
-
-    def update_direction(self):
-        "Zapisuje w właściwości degree_vector kierunek jako wektor"
-        degree_in_radians = self.direction / 16 * math.tau
-        self.direction_vector = Vector(math.cos(degree_in_radians), math.sin(degree_in_radians))
 
     def reduce_speed(self, rate):
         "Zmniejsza prędkość gracz. Używane do symulowania tarcie"
@@ -339,8 +344,8 @@ class EnemyCar2(EnemyCar):
 
     def draw_debug(self):
         super().draw_debug()
-        for p in lidar:
-            pygame.draw.line(self.game.screen, (255, 0, 0), tuple(self.position), tuple(p))
+        # for p in lidar:
+            # pygame.draw.line(self.game.screen, (255, 0, 0), tuple(self.position), tuple(p))
 
 
     def ray_march(self, start, direction):
@@ -388,3 +393,31 @@ class EnemyCar3(EnemyCar):
 
     def draw(self):
         super().draw()
+
+
+class EnemyCar4(EnemyCar2):
+    def update(self):
+        player = filter(lambda x: isinstance(x, PlayerCar), self.game.cars).__iter__().__next__()
+        # naszym celem jest punkt przed graczem
+        target = player.position + player.direction_vector * 100
+
+        player_dist = (self.position - player.position).length()
+        target_dist = (self.position - target).length()
+        # jeżeli blisko gracza
+        if player_dist < 250 and player.velocity.length() > 3:
+            EnemyCar.update(self)
+            # jeżeli bardziej przed graczem to ustaw się centralnie przed graczem
+            if target_dist < player_dist:
+                self.turn_to_target(target)
+            # jeżeli bardziej za graczem to spróbuj wyprzedzić gracza
+            else:
+                target = player.position + player.direction_vector.rotate(math.pi/4) * 80
+                self.turn_to_target(target)
+            pygame.draw.circle(self.game.screen, pygame.Color('red'), tuple(target), 3)
+        # jeżeli daleko od gracza to jedź normalnie
+        else:
+            super().update()
+
+    def draw(self):
+        super().draw()
+        # super().draw_debug()

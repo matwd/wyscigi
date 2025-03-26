@@ -138,6 +138,7 @@ class Game:
         self.state = GameState.game_settings
 
     def start_race(self, map, chosen_car):
+        self.selected_map = map
         self.map.load_from_directory(f"assets/maps/map-{map:02}", map)
 
         self.init_cars(chosen_car-1)
@@ -201,7 +202,8 @@ class Game:
 
             self.map.draw_overlay()
 
-            self.snowfall.snowfall(self.screen, random.random() - 0.5)
+            if self.selected_map == 3:
+                self.snowfall.snowfall(self.screen, random.random() - 0.5)
 
             self.time += 1000 / 60
             text_surface = self.font.render(self.ms_to_sec(self.time), True, (255, 255, 255))

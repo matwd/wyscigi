@@ -344,8 +344,8 @@ class EnemyCar2(EnemyCar):
 
     def draw_debug(self):
         super().draw_debug()
-        for p in lidar:
-            pygame.draw.line(self.game.screen, (255, 0, 0), tuple(self.position), tuple(p))
+        # for p in lidar:
+            # pygame.draw.line(self.game.screen, (255, 0, 0), tuple(self.position), tuple(p))
 
 
     def ray_march(self, start, direction):
@@ -393,3 +393,31 @@ class EnemyCar3(EnemyCar):
 
     def draw(self):
         super().draw()
+
+
+class EnemyCar4(EnemyCar2):
+    def update(self):
+        player = filter(lambda x: isinstance(x, PlayerCar), self.game.cars).__iter__().__next__()
+        # naszym celem jest punkt przed graczem
+        target = player.position + player.direction_vector * 100
+
+        player_dist = (self.position - player.position).length()
+        target_dist = (self.position - target).length()
+        # jeżeli blisko gracza
+        if player_dist < 250 and player.velocity.length() > 3:
+            EnemyCar.update(self)
+            # jeżeli bardziej przed graczem to ustaw się centralnie przed graczem
+            if target_dist < player_dist:
+                self.turn_to_target(target)
+            # jeżeli bardziej za graczem to spróbuj wyprzedzić gracza
+            else:
+                target = player.position + player.direction_vector.rotate(math.pi/4) * 80
+                self.turn_to_target(target)
+            pygame.draw.circle(self.game.screen, pygame.Color('red'), tuple(target), 3)
+        # jeżeli daleko od gracza to jedź normalnie
+        else:
+            super().update()
+
+    def draw(self):
+        super().draw()
+        # super().draw_debug()

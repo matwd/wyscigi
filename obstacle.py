@@ -17,7 +17,7 @@ class Obstacle:
         "Rysowanie przeszkody"
         self.game.screen.blit(self.sprite, (*tuple(self.position - Vector(64, 44)), 128, 128))
 
-    def draw_debug(self)
+    def draw_debug(self):
         "Rysowanie hitbox przeszkody"
         self.hitbox.draw(self.game.screen)
 

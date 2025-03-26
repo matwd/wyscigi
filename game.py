@@ -116,6 +116,7 @@ class Game:
         for i, car in enumerate(self.cars):
             car.map = self.map
             car.x, car.y, car.direction = self.map.starting_points[i]
+
             car.okrazenie = 0
             car.track_progress = 0
 

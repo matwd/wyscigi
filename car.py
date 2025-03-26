@@ -25,12 +25,24 @@ class Car:
         self.position = Vector()
         self.velocity = Vector(0, 0)
         self.rotation_cooldown = 0
-        self.direction = 0
+        self._direction = 0
         self.spin = 0
         self.nitro = 100
         self.hitbox = RectangleHitbox(self.x, self.y, 0, 80, 36)
         self.has_banana_peel = True
-        self.update_direction()
+
+    @property
+    def direction(self):
+        return self._direction
+
+    @direction.setter
+    def direction(self, value):
+        # ustawia kierunek (jeden z 16 możliwych) i wektor kierunku
+        self._direction = value
+        # Zapisuje w właściwości degree_vector kierunek jako wektor
+        degree_in_radians = self.direction / 16 * math.tau
+        self.direction_vector = Vector(math.cos(degree_in_radians), math.sin(degree_in_radians))
+        self.recalculate_hitbox()
 
     @property
     def x(self):
@@ -130,7 +142,6 @@ class Car:
             self.rotation_cooldown = 7
             self.direction -= 1
             self.direction %= 16
-            self.update_direction()
 
     def turn_right(self):
         "Skręcanie w prawo"
@@ -139,12 +150,6 @@ class Car:
             self.rotation_cooldown = 7
             self.direction += 1
             self.direction %= 16
-            self.update_direction()
-
-    def update_direction(self):
-        "Zapisuje w właściwości degree_vector kierunek jako wektor"
-        degree_in_radians = self.direction / 16 * math.tau
-        self.direction_vector = Vector(math.cos(degree_in_radians), math.sin(degree_in_radians))
 
     def reduce_speed(self, rate):
         "Zmniejsza prędkość gracz. Używane do symulowania tarcie"

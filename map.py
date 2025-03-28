@@ -90,7 +90,7 @@ class Map:
     def get_ground_params(self, vec: Vector) -> tuple[float, float]:
         normal = (0.1, 0.99)
         ice = (0.2, 0.996)
-        sand = (0.05, 0.99)
+        sand = (0.05, 0.98)
         rect = self.hitbox.get_rect()
 
         if 0 < vec.x < rect.width and 0 < vec.y < rect.height:
@@ -108,6 +108,10 @@ class Map:
             # kolor niebieski to lód (mniejsze tarcie i sterowność)
             if hitbox_color == (0, 0, 255, 255):
                 return ice
+
+            # kolor ̣̣żółty oznacza piasek (większe tarcie)
+            if hitbox_color == (255, 255, 0, 255):
+                return sand
 
         return normal
 

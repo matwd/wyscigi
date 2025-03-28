@@ -19,11 +19,11 @@ class ResultsScreen:
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    self.game.selected_map = min(2, self.game.selected_map + 1)
+                    self.game.selected_map = min(3, self.game.selected_map + 1)
                     self.page = 0
                     self.max_page = -1
                 if event.key == pygame.K_DOWN:
-                    self.game.selected_map = max(0, self.game.selected_map - 1)
+                    self.game.selected_map = max(1, self.game.selected_map - 1)
                     self.page = 0
                     self.max_page = -1
                 if event.key == pygame.K_p:
@@ -31,7 +31,7 @@ class ResultsScreen:
                 if event.key == pygame.K_n:
                     self.page = min(self.max_page, self.page + 1)
                 if event.key == pygame.K_RETURN:
-                    self.game.selected_map = 0
+                    self.game.selected_map = 1
                     self.game.show_main()
 
     def draw(self):
@@ -39,9 +39,9 @@ class ResultsScreen:
         pygame.draw.rect(self.game.screen, (0, 0, 0), self.resultsBg)
 
         results = {
-            "map0": [],
             "map1": [],
-            "map2": []
+            "map2": [],
+            "map3": []
         }
 
         try:
@@ -49,7 +49,7 @@ class ResultsScreen:
                 results = json.load(file)
         except:
             with open("results.json", "r") as file:
-                file.write("{map0: [], map1: [], map2: []}")
+                json.dump(results, file)
 
         ranking = results[f"map{self.game.selected_map}"]
 

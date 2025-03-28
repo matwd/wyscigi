@@ -1,3 +1,4 @@
+from __future__ import annotations
 from vector import Vector
 import math
 import pygame
@@ -6,17 +7,15 @@ from hitbox import RectangleHitbox
 from obstacle import Obstacle
 
 class PowerUp:
-    def __init__(self, sprite):
+    def __init__(self, sprite: pygame.surface.Surface) -> None:
         self.sprite = sprite
 
-    def use_on_car(self, car):
+    def use_on_car(self, car: Car) -> None:
         pass
-
-
 
 class Car:
     "Klasa Samochodu z której dziedziczą klasy gracza i przeciwników"
-    def __init__(self, game, sprites):
+    def __init__(self, game: Game, sprites: list[pygame.surface.Surface]) -> None:
         self.game = game
         self.sprites = sprites
         # poślizg i tarcie są aktualizowane później zależnie od terenu po którym jedzie samochów
@@ -32,11 +31,11 @@ class Car:
         self.has_banana_peel = True
 
     @property
-    def direction(self):
+    def direction(self) -> int:
         return self._direction
 
     @direction.setter
-    def direction(self, value):
+    def direction(self, value: int) -> None:
         # ustawia kierunek (jeden z 16 możliwych) i wektor kierunku
         self._direction = value
         # Zapisuje w właściwości degree_vector kierunek jako wektor
@@ -45,27 +44,27 @@ class Car:
         self.recalculate_hitbox()
 
     @property
-    def x(self):
+    def x(self) -> int:
         return self.position.x
 
     @x.setter
-    def x(self, value):
+    def x(self, value: int) -> None:
         self.position.x = value
         self.recalculate_hitbox()
 
     @property
-    def y(self):
+    def y(self: int) -> None:
         return self.position.y
 
     @y.setter
-    def y(self, value):
+    def y(self, value: int) -> None:
         self.position.y = value
         self.recalculate_hitbox()
 
-    def is_going_forward(self):
+    def is_going_forward(self) -> bool:
         return self.direction_vector.scalar_product(self.velocity) > 0
 
-    def update(self):
+    def update(self) -> None:
         self.reduce_speed(self.tarcie)
 
         old_position = self.position
@@ -118,7 +117,7 @@ class Car:
         self.recalculate_hitbox()
         self.rotation_cooldown -= 1
 
-    def draw(self):
+    def draw(self) -> None:
         "Rysowanie samochodu"
         rect = self.sprites[0].get_rect()
         image_rect = pygame.Rect(self.x-rect.width/2, self.y-rect.width/2+random.randint(-1, 1), 256, 256)
@@ -129,13 +128,13 @@ class Car:
 
         self.hitbox.pos = self.position.copy()
 
-    def draw_debug(self):
+    def draw_debug(self) -> None:
         "Rysowanie hitboxa samochodu (Funkcja do debugowania)"
         self.hitbox.draw(self.game.screen)
         pygame.draw.circle(self.game.screen, pygame.Color('red'), (self.x, self.y), 3)
 
 
-    def turn_left(self):
+    def turn_left(self) -> None:
         "Skręcanie w lewo"
         if self.rotation_cooldown <= 0 and self.spin <= 0:
             self.velocity = self.velocity.rotate(-0.4 + self.poslizg)
@@ -143,7 +142,7 @@ class Car:
             self.direction -= 1
             self.direction %= 16
 
-    def turn_right(self):
+    def turn_right(self) -> None:
         "Skręcanie w prawo"
         if self.rotation_cooldown <= 0 and self.spin <= 0:
             self.velocity = self.velocity.rotate(0.4 - self.poslizg)
@@ -151,28 +150,28 @@ class Car:
             self.direction += 1
             self.direction %= 16
 
-    def reduce_speed(self, rate):
+    def reduce_speed(self, rate: float) -> None:
         "Zmniejsza prędkość gracz. Używane do symulowania tarcie"
         self.velocity *= rate
 
-    def accelerate(self, speed):
+    def accelerate(self, speed: float) -> None:
         "Przyspiesza gracza w kierunku w który jest skierowany"
         self.velocity += speed * self.direction_vector
 
-    def recalculate_hitbox(self):
+    def recalculate_hitbox(self) -> None:
         "Przesuwa i obraca hitbox po przesunięciu lub obrocie gracza"
         forward = self.direction / 16 * math.tau
         self.hitbox.rotation = forward
         self.hitbox.position = self.position.copy()
 
-    def leave_obstacle(self):
+    def leave_obstacle(self) -> None:
         "Zostawia na ziemi przeszkodę (banana)"
         banana_texture = pygame.image.load("./assets/banana.png").convert_alpha()
         self.game.map.dissapearing_obstacles.append(Obstacle(self.game, self.position - self.direction_vector.normalize() * 60, banana_texture))
 
 class PlayerCar(Car):
     "Klasa auta gracza"
-    def update(self):
+    def update(self) -> None:
         super().update()
         # jażeli gracz wpadł w przeszkodę to nie może skręcać
         if self.spin > 0:
@@ -211,7 +210,7 @@ class PlayerCar(Car):
 
 class EnemyCar(Car):
     "Klasa abstrakcyjna dla wszystkich przeciwników"
-    def __init__(self, game, sprites, waypoints):
+    def __init__(self, game: Game, sprites: list[pygame.surface.Surface], waypoints: list[CircleHitbox]) -> None:
         """
         Funkcja inicjalizująca samochodu przyjmuje również listę
         punktów po których przeciwnik jeździ w kółko
@@ -220,7 +219,7 @@ class EnemyCar(Car):
         self.waypoints = waypoints
         self.next_target = 0
 
-    def update(self):
+    def update(self) -> None:
         super().update()
         # jeżeli gracz przejedzie przez jakikolwiek waypoint
         # to ustawia kolejny waypoint na swój cel
@@ -231,7 +230,7 @@ class EnemyCar(Car):
         # if target.check_hit(self.position):
         #     self.next_target = (self.next_target + 1) % len(self.waypoints)
 
-    def turn_to_target(self, target: Vector):
+    def turn_to_target(self, target: Vector) -> None:
         "Obróć się do celu i jedź do niego"
 
         # obliczenie kierunku w który przeciwnik powinien jechać
@@ -257,7 +256,7 @@ class EnemyCar(Car):
                 self.accelerate(0.2)
 
 class EnemyCar1(EnemyCar):
-    def update(self):
+    def update(self) -> None:
         super().update()
 
         # pierwszy przeciwnik poprostu jedzie w stronę kolejnego celu
@@ -268,11 +267,9 @@ class EnemyCar1(EnemyCar):
         super().draw()
 
 class EnemyCar2(EnemyCar):
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.close_wall_check_cooldown = 0
+    close_wall_check_cooldown = 0
 
-    def update(self):
+    def update(self) -> None:
         super().update()
 
         # pierwsza część logiki kierowania
@@ -342,27 +339,25 @@ class EnemyCar2(EnemyCar):
         # zmniejszanie cooldownu reakcji na bliską ścianę
         self.close_wall_check_cooldown -= 1
 
-    def draw_debug(self):
+    def draw_debug(self) -> None:
         super().draw_debug()
         # for p in lidar:
             # pygame.draw.line(self.game.screen, (255, 0, 0), tuple(self.position), tuple(p))
 
 
-    def ray_march(self, start, direction):
+    def ray_march(self, start: Vector, direction: Vector) -> Vector:
         # wysyłanie promienia w wybranym kierunku i sprawdzenie
         # odległości od trafionego punktu
         # używamy metody podobnej do raymarchingu (ale jednak innej)
         # tu można poczytać więcej https://en.wikipedia.org/wiki/Ray_marching
         while self.game.map.is_point_on_track(start):
             # mnożymy razy pięć, żeby trochę to zoptymalizować
-            # obliczenia są mniej precyzyjne, zle zajmują 5 razy mniej czasu
+            # obliczenia są mniej precyzyjne, ale zajmują 5 razy mniej czasu
             start += direction * 5
         return start
 
-
 class EnemyCar3(EnemyCar):
-
-    def update(self):
+    def update(self) -> None:
         super().update()
 
         # target = Vector(*pygame.mouse.get_pos())
@@ -391,12 +386,12 @@ class EnemyCar3(EnemyCar):
         #         self.next_target = (index + 1) % len(self.waypoints)
 
 
-    def draw(self):
+    def draw(self) -> None:
         super().draw()
 
 
 class EnemyCar4(EnemyCar2):
-    def update(self):
+    def update(self) -> None:
         player = filter(lambda x: isinstance(x, PlayerCar), self.game.cars).__iter__().__next__()
         # naszym celem jest punkt przed graczem
         target = player.position + player.direction_vector * 100
@@ -418,6 +413,6 @@ class EnemyCar4(EnemyCar2):
         else:
             super().update()
 
-    def draw(self):
+    def draw(self) -> None:
         super().draw()
         # super().draw_debug()

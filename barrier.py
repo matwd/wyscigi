@@ -9,7 +9,7 @@ class GateState:
 
 
 class Barrier:
-    def __init__(self, x, y, scale, is_dark=False):
+    def __init__(self, x: int, y: int, scale: float, is_dark: bool=False) -> None:
         self.sprites = [pygame.image.load(f"assets/barrier/{i:>04}.png") for i in range(1, 17)]
         if is_dark:
             [s.fill((50, 50, 50), special_flags=pygame.BLEND_MULT) for s in self.sprites]
@@ -23,7 +23,7 @@ class Barrier:
         # wartości poniżej zależą od wielkości tekstury i umiejscowienia obiektów na teksturze
         self.hitbox = RectangleHitbox(x, y + 75 * scale, 0, 60 * scale, 128 * scale)
 
-    def update(self):
+    def update(self) -> None:
         match self.state:
             case GateState.closing:
                 self.frame -= 1
@@ -41,10 +41,10 @@ class Barrier:
                 else:
                     self.wait_time -= 1
 
-    def draw(self, screen):
+    def draw(self, screen: pygame.surface.Surface) -> None:
         screen.blit(self.sprites[self.frame], (self.drawing_x, self.drawing_y))
 
-    def check_hit(self, point):
+    def check_hit(self, point: tuple[int, int]) -> bool:
         """Sprawdzanie kolizji z szlabanem"""
         # nie można wjechać w szlaban, jeżeli jest on podniesiony
         if self.frame > 0:

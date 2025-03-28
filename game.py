@@ -33,7 +33,7 @@ class Game:
     """
     Klasa gry. Obsługuje pętle główną i zamykanie okna gry
     """
-    def __init__(self):
+    def __init__(self) -> None:
         # Inicjalizowanie biblioteki pygame i otworzenie okna
         pygame.init()
         pygame.font.init()
@@ -98,7 +98,7 @@ class Game:
 
         self.show_main()
 
-    def init_cars(self, player_car_sprite):
+    def init_cars(self, player_car_sprite: int) -> None:
         self.cars = []
 
         sprites = self.sprites.copy()
@@ -120,7 +120,7 @@ class Game:
             car.track_progress = 0
 
 
-    def run(self):
+    def run(self) -> None:
         """
         Gra po uruchomieniu wywołuje pętlę główną gry 60 razy na sekundę
         aż do ustawienia zmienner self.running na False
@@ -133,10 +133,10 @@ class Game:
             # print(a)
         pygame.quit()
 
-    def open_settings(self):
+    def open_settings(self) -> None:
         self.state = GameState.game_settings
 
-    def start_countdown(self, map, chosen_car):
+    def start_countdown(self, map: Map, chosen_car: int) -> None:
         if self.sound:
             self.music.stop()
             self.music.unload()
@@ -149,7 +149,7 @@ class Game:
 
         self.init_cars(chosen_car-1)
 
-    def start_race(self):
+    def start_race(self) -> None:
         
         self.lap_times = [0, 0, 0]
 
@@ -158,14 +158,13 @@ class Game:
 
         self.state = GameState.race
 
-    def end_race(self):
-        # self.time = random.randint(2000, 5000) / 100
+    def end_race(self) -> None:
         self.state = GameState.end_screen
 
-    def show_result(self):
+    def show_result(self) -> None:
         self.state = GameState.result_screen
 
-    def show_main(self):
+    def show_main(self) -> None:
         if self.sound:
 
             self.music.stop()
@@ -176,13 +175,13 @@ class Game:
 
         self.state = GameState.main_menu
 
-    def ms_to_sec(self, ms):
+    def ms_to_sec(self, ms: float) -> str:
         ms = int(ms)
         seconds = ms // 1000
         ms = ms % 1000
         return f"{seconds}.{ms}"
 
-    def mainloop(self):
+    def mainloop(self) -> None:
         events = pygame.event.get()
 
         self.screen.fill((0, 0, 0))
@@ -266,7 +265,7 @@ class Game:
             if event.type == pygame.QUIT:
                 self.running = False
 
-    def draw_debug(self):
+    def draw_debug(self) -> None:
         for car in self.cars:
             car.draw_debug()
         for i in self.map.progress_rectangles:
@@ -274,7 +273,7 @@ class Game:
         for d in self.map.waypoints:
             d.draw(self.screen)
 
-    def update_cars(self):
+    def update_cars(self) -> None:
         self.cars.sort(key=lambda x: x.position.y)
         for car in self.cars:
             car.update()

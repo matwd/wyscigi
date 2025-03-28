@@ -1,8 +1,9 @@
+from __future__ import annotations
 import pygame
 import json
 
 class EndScreen:
-    def __init__(self, game):
+    def __init__(self, game: Game) -> None:
         self.game = game
         self.font = pygame.font.Font("assets/font/Jersey10.ttf", 40)
         self.bg = pygame.image.load("assets/menu/mainmenu1920x1080.png").convert()
@@ -13,7 +14,7 @@ class EndScreen:
 
         self.smallerBg = pygame.Rect(self.screen_width // 4, self.screen_height // 4, 960, 540)
 
-    def update(self, events):
+    def update(self, events: list[pygame.event.Event]) -> None:
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_BACKSPACE:
@@ -49,7 +50,7 @@ class EndScreen:
                 else:
                     self.name += event.unicode
 
-    def draw(self):
+    def draw(self) -> None:
         self.game.screen.blit(self.bg, (0, 0))
         pygame.draw.rect(self.game.screen, (0, 0, 0), self.smallerBg)
 

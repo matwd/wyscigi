@@ -31,5 +31,6 @@ class CountdownScreen:
         self.game.map.draw_overlay()
         for car in self.game.cars:
             car.draw()
-        self.game.screen.blit(self.time_text, self.time_text_rect)
+        if self.time != 4:
+            self.game.screen.blit(self.time_text, self.time_text_rect)
 

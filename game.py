@@ -1,18 +1,13 @@
 import pygame
 import random
 import itertools
-import json
-from os import path
 from main_menu import MainMenu
 from end_screen import EndScreen
 from results_screen import ResultsScreen
 from car import PlayerCar, EnemyCar1, EnemyCar2, EnemyCar3, EnemyCar4
-from obstacle import Obstacle
 from snowfall import Snowfall
-from vector import Vector
 from game_settings import GameSettings
 from countdown import CountdownScreen
-from barrier import Barrier
 from map import Map
 
 class GameState():
@@ -176,7 +171,7 @@ class Game:
             self.music.stop()
             self.music.unload()
 
-            self.music.load("assets/music/main_menu.mp3")
+            self.music.load("assets/music/menu.mp3")
             self.music.play(-1)
 
         self.state = GameState.main_menu
@@ -288,6 +283,8 @@ class Game:
             for obstacle in self.map.obstacles:
                 if car.spin <= 0 and obstacle.collides(car.position) and car.velocity.length() > 5:
                     car.spin = 16*2
+                    if self.sound:
+                        pygame.mixer.Sound("assets/sfx/poslizg.mp3").play()
                     car.reduce_speed(0.1)
 
             for obstacle in self.map.dissapearing_obstacles:

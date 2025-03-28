@@ -142,6 +142,12 @@ class Game:
         self.state = GameState.game_settings
 
     def start_countdown(self, map, chosen_car):
+        if self.sound:
+            self.music.stop()
+            self.music.unload()
+
+            self.music.load("./assets/music/level_1.mp3")
+            self.music.play(-1)
         self.state = GameState.starting_countdown
         self.selected_map = map
         self.map.load_from_directory(f"assets/maps/map-{map:02}", map)
@@ -153,12 +159,7 @@ class Game:
         self.lap_times = [0, 0, 0]
 
 
-        if self.sound:
-            self.music.stop()
-            self.music.unload()
-
-            self.music.load("./assets/music/level_1.mp3")
-            self.music.play(-1)
+        
 
         self.state = GameState.race
 

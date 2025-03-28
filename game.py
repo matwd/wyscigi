@@ -167,7 +167,7 @@ class Game:
             self.music.stop()
             self.music.unload()
 
-            self.music.load("assets/music/level_3.ogg")
+            self.music.load("assets/music/main_menu.mp3")
             self.music.play(-1)
 
         self.state = GameState.main_menu

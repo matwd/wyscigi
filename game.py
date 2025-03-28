@@ -196,7 +196,8 @@ class Game:
 
             for event in events:
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_r:
+                    keys = pygame.key.get_pressed()
+                    if keys[pygame.K_LCTRL] and keys[pygame.K_F1]:
                         self.end_race()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     print(event.pos)
@@ -260,7 +261,8 @@ class Game:
         # zamykanie gry
         for event in events:
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_q:
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_LCTRL] and keys[pygame.K_F2]:
                     self.running = False
             if event.type == pygame.QUIT:
                 self.running = False

@@ -229,7 +229,7 @@ class Game:
                 self.screen.blit(time_surface, (screen_width / 2 - time_width / 2 + space_for_time_text * (i - 1), 25))
 
 
-            self.draw_debug()
+            # self.draw_debug()
 
 
         elif self.state == GameState.end_screen:

@@ -1,5 +1,4 @@
-from hitbox import RectangleHitbox, CircleHitbox
-import pygame
+from hitbox import RectangleHitbox
 from vector import Vector
 
 class Obstacle:

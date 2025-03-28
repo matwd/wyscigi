@@ -2,7 +2,7 @@ from vector import Vector
 import math
 import pygame
 import random
-from hitbox import RectangleHitbox, CircleHitbox
+from hitbox import RectangleHitbox
 from obstacle import Obstacle
 
 class PowerUp:

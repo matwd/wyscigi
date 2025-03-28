@@ -1,3 +1,4 @@
+from __future__ import annotations
 import pygame
 from button import Button
 
@@ -6,7 +7,7 @@ class GameSettings:
     """
     Klasa odpowiedzialna za ekran z wyborem pojazdu oraz mapy  
     """
-    def __init__(self, game):
+    def __init__(self, game: Game) -> None:
 
         self.car_frame_index = 6
         self.last_frame_time = pygame.time.get_ticks()
@@ -76,7 +77,7 @@ class GameSettings:
                                   hover_color=(86,86,86),real_screen=self.game.real_screen)
 
 
-    def update(self, events):
+    def update(self, events: list[pygame.event.Event]) -> None:
 
         current_time = pygame.time.get_ticks()
         if current_time - self.last_frame_time > 200:  # 500ms = 0.5s
@@ -152,7 +153,7 @@ class GameSettings:
                         self.chosen_map = index
                 
 
-    def draw(self):
+    def draw(self) -> None:
         # Odpowiednie ustawienie wszystkich przycisków, obrazków oraz napisów na ekranie
 
         self.play_button.update(self.game.screen)

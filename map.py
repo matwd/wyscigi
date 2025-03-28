@@ -14,7 +14,7 @@ class Map:
     kolizji z torem, oraz obiekty znajdące się na torze np. przeszkody itp
     """
     # def __init__(self, screen, track_filename, overlay_filename, hitbox_filename, starting_x, starting_y):
-    def __init__(self, screen):
+    def __init__(self, screen: pygame.surface.Surface) -> None:
         """
         Inicjalizacja obiekty Map, ale bez ładowania tekstur i hitboxów.
         Te muszą zostać załadowane metodą load_from_directory
@@ -33,7 +33,7 @@ class Map:
         self.starting_x = 440
         self.starting_y = 440
 
-    def load_from_directory(self, map_directory, level):
+    def load_from_directory(self, map_directory: str, level: int) -> None:
         """
         Matoda ładuje dane o danym torze.
         Argument map_directory to ścieżka do folderu z danymi toru.
@@ -74,7 +74,7 @@ class Map:
 
         self.starting_points = map_data["starting_points"]
 
-    def is_point_on_track(self, vec):
+    def is_point_on_track(self, vec: Vector) -> bool:
         rect = self.hitbox.get_rect()
 
         # sprawdź czy nie uderzono w szlaban
@@ -87,7 +87,7 @@ class Map:
 
         return False
 
-    def get_ground_params(self, vec) -> ("tarcie", "starowność"):
+    def get_ground_params(self, vec: Vector) -> tuple[float, float]:
         normal = (0.1, 0.99)
         ice = (0.2, 0.996)
         sand = (0.05, 0.99)
@@ -111,12 +111,12 @@ class Map:
 
         return normal
 
-    def draw_background(self):
+    def draw_background(self) -> None:
         self.screen.blit(self.background, (0, 0))
         for obstacle in self.obstacles + self.dissapearing_obstacles:
             obstacle.draw()
 
-    def draw_overlay(self):
+    def draw_overlay(self) -> None:
         self.screen.blit(self.overlay, (0, 0))
         if self.barrier:
             self.barrier.draw(self.screen)

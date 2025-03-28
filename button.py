@@ -4,7 +4,7 @@ class Button():
     """
     Klasa przycisku. Obsługuje najechanie oraz naciśnięcie przycisku
     """
-    def __init__(self,pos,text_var,font,text_color,hover_color,real_screen):
+    def __init__(self, pos: tuple[int, int], text_var: str, font: pygame.font.Font, text_color: pygame.color.Color, hover_color: pygame.color.Color, real_screen: pygame.surface.Surface) -> None:
         self.x = pos[0]
         self.y = pos[1]
         self.font = font
@@ -15,10 +15,10 @@ class Button():
         self.text = self.font.render(self.text_var, True, self.text_color)
         self.rect = self.text.get_rect(center=(self.x,self.y))
 
-    def update(self,screen):
-        screen.blit(self.text,self.rect)
+    def update(self, screen: pygame.surface.Surface) -> None:
+        screen.blit(self.text, self.rect)
         
-    def checkForInput(self,position):
+    def checkForInput(self, position: tuple[int, int]) -> bool:
         """
         Obsługa naciśnięcia przycisku.
         """
@@ -27,7 +27,7 @@ class Button():
             return True
         return False
     
-    def changeColor(self,position):
+    def changeColor(self, position: tuple[int, int]) -> None:
         """
         Obsługa zmiany koloru przycisku po najechaniu
         """

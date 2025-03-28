@@ -1,17 +1,13 @@
 import pygame
 import random
 import itertools
-import json
-from os import path
 from main_menu import MainMenu
 from end_screen import EndScreen
 from results_screen import ResultsScreen
 from car import PlayerCar, EnemyCar1, EnemyCar2, EnemyCar3, EnemyCar4
-from obstacle import Obstacle
 from snowfall import Snowfall
-from vector import Vector
 from game_settings import GameSettings
-from barrier import Barrier
+from countdown import CountdownScreen
 from map import Map
 
 class GameState():
@@ -22,12 +18,14 @@ class GameState():
     main_menu = 0
     # wybór opcji gry
     game_settings = 1
+    # odliczanie do zaczecia gry
+    starting_countdown = 2
     # trwa wyścig
-    race = 2
+    race = 3
     # zakończenie wyścigu
-    end_screen = 3
+    end_screen = 4
     # ekran z wynikami
-    result_screen = 4
+    result_screen = 5
 
 debug = True
 
@@ -87,6 +85,7 @@ class Game:
         self.game_settings = GameSettings(self)
         self.end_screen = EndScreen(self)
         self.results_screen = ResultsScreen(self)
+        self.countdown_screen = CountdownScreen(self)
 
         # inicjalizacja efektu opadania śniegu
         self.snowfall = Snowfall(-10, 20, 1.25, 2, 1920, 1080)
@@ -137,20 +136,25 @@ class Game:
     def open_settings(self) -> None:
         self.state = GameState.game_settings
 
-    def start_race(self, map: Map, chosen_car: int) -> None:
-        self.selected_map = map
-        self.map.load_from_directory(f"assets/maps/map-{map:02}", map)
-
-        self.init_cars(chosen_car-1)
-        self.lap_times = [0, 0, 0]
-
-
+    def start_countdown(self, map: Map, chosen_car: int) -> None:
         if self.sound:
             self.music.stop()
             self.music.unload()
 
             self.music.load("./assets/music/level_1.mp3")
             self.music.play(-1)
+        self.state = GameState.starting_countdown
+        self.selected_map = map
+        self.map.load_from_directory(f"assets/maps/map-{map:02}", map)
+
+        self.init_cars(chosen_car-1)
+
+    def start_race(self) -> None:
+        
+        self.lap_times = [0, 0, 0]
+
+
+        
 
         self.state = GameState.race
 
@@ -245,6 +249,10 @@ class Game:
         elif self.state == GameState.game_settings:
             self.game_settings.update(events)
             self.game_settings.draw()
+        
+        elif self.state == GameState.starting_countdown:
+            self.countdown_screen.update(events)
+            self.countdown_screen.draw()
 
         self.real_screen.blit(pygame.transform.scale(self.screen, self.real_screen.get_size()), (0, 0))
         pygame.display.flip()

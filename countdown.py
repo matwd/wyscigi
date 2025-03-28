@@ -27,5 +27,9 @@ class CountdownScreen:
 
 
     def draw(self):
+        self.game.map.draw_background()
+        self.game.map.draw_overlay()
+        for car in self.game.cars:
+            car.draw()
         self.game.screen.blit(self.time_text, self.time_text_rect)
 

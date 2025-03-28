@@ -1,17 +1,12 @@
 import pygame
 import random
 import itertools
-import json
-from os import path
 from main_menu import MainMenu
 from end_screen import EndScreen
 from results_screen import ResultsScreen
 from car import PlayerCar, EnemyCar1, EnemyCar2, EnemyCar3, EnemyCar4
-from obstacle import Obstacle
 from snowfall import Snowfall
-from vector import Vector
 from game_settings import GameSettings
-from barrier import Barrier
 from map import Map
 
 class GameState():

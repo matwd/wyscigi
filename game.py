@@ -261,8 +261,7 @@ class Game:
         # zamykanie gry
         for event in events:
             if event.type == pygame.KEYDOWN:
-                keys = pygame.key.get_pressed()
-                if keys[pygame.K_LCTRL] and keys[pygame.K_F2]:
+                if event.key == pygame.K_ESCAPE:
                     self.running = False
             if event.type == pygame.QUIT:
                 self.running = False

@@ -20,8 +20,8 @@ class CountdownScreen:
         if current_time - self.last_frame_time > 1000:
             self.time-=1
             if self.time == 0:
-                self.time = 4
                 self.game.start_race()
+                self.time = 4
             self.time_text = self.font.render(str(self.time), True, (255,255,255))
             self.last_frame_time = current_time
 

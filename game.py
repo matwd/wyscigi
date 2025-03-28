@@ -214,19 +214,22 @@ class Game:
             if player.okrazenie < 3:
                 self.lap_times[player.okrazenie] += 1000 / 60
 
+            screen_width = self.screen.get_width()
+
             for i, time in enumerate(self.lap_times):
                 time_color = (123, 123, 123)
                 if (i == player.okrazenie):
                     time_color = (255, 255, 255)
 
-                time_surface = self.font.render(self.ms_to_sec(time), True, time_color)
-                
+                time_surface = self.font.render(self.ms_to_sec(time), True, time_color)    
                 time_width = time_surface.get_width()
-                screen_width = self.screen.get_width()
 
                 space_for_time_text = 150
 
                 self.screen.blit(time_surface, (screen_width / 2 - time_width / 2 + space_for_time_text * (i - 1), 25))
+
+            lap_surface = self.font.render(f"{player.okrazenie + 1}/3", True, (255, 255, 255))
+            self.screen.blit(lap_surface, (screen_width - lap_surface.get_width() - 25, 25))
 
 
             # self.draw_debug()

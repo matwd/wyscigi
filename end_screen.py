@@ -25,9 +25,9 @@ class EndScreen:
                         return
 
                     results = {
-                        "map0": [],
                         "map1": [],
-                        "map2": []
+                        "map2": [],
+                        "map3": []
                     }
 
                     try:
@@ -36,7 +36,8 @@ class EndScreen:
                     except:
                         # jeśli nie ma pliku to go tworzy z pustymi arrayem json
                         with open("results.json", "w") as file:
-                            file.write("{map0: [], map1: [], map2: []}")
+                            json.dump(results, file)
+                            # file.write("{map0: [], map1: [], map2: []}")
 
                     results[f"map{self.game.selected_map}"].append({"name": self.name, "time": float(self.game.ms_to_sec(self.game.time))})
 

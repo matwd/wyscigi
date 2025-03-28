@@ -9,8 +9,10 @@ class GateState:
 
 
 class Barrier:
-    def __init__(self, x, y, scale):
+    def __init__(self, x, y, scale, is_dark=False):
         self.sprites = [pygame.image.load(f"assets/barrier/{i:>04}.png") for i in range(1, 17)]
+        if is_dark:
+            [s.fill((50, 50, 50), special_flags=pygame.BLEND_MULT) for s in self.sprites]
         self.sprites = [pygame.transform.scale(spr, (32 * scale, 512 * scale)).convert_alpha() for spr in self.sprites]
         self.pos = (x, y)
         self.frame = 0

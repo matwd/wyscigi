@@ -2,13 +2,18 @@ from vector import Vector
 import pygame
 
 class Hitbox:
+    """
+    Klasa abstrakcyjna dla hitboxów w różnych kształtach
+    """
     def __init__(self):
         raise NotImplementedError("Nie zaimplementowano inicjalizacji wektora")
 
     def draw(self, screen):
+        "Rysowanie hitboxa (dla debugowania/nie powinno być użyte w grze)"
         raise NotImplementedError("Nie zaimplementowano rysowania hitboxa")
 
     def check_hit(self, point):
+        "Sprawdzanie kolizji punktu z hitboxem"
         raise NotImplementedError("Nie zaimplementowano sprawdzania przynależności punktu do hitboxa")
 
 class CircleHitbox(Hitbox):
@@ -23,6 +28,10 @@ class CircleHitbox(Hitbox):
         return (self.position - point).length() < self.radius
 
 class RectangleHitbox(Hitbox):
+    """
+    Hitbox w kształci prostokąta
+    Prostokąt może być obrócony (parametr rotation)
+    """
     def __init__(self, x, y, rotation, width, height):
         self.position = Vector(x, y)
         self.rotation = rotation
@@ -30,6 +39,7 @@ class RectangleHitbox(Hitbox):
         self.height = height
 
     def get_points(self):
+        "Zwraca listę krawędzi prostokąta"
         point1_offset = Vector(self.width/2, -self.height/2).rotate(self.rotation)
         point2_offset = Vector(self.width/2, self.height/2).rotate(self.rotation)
         point3_offset = -point1_offset

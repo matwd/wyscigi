@@ -15,9 +15,10 @@ class PowerUp:
 
 class Car:
     "Klasa Samochodu z której dziedziczą klasy gracza i przeciwników"
-    def __init__(self, game: Game, sprites: list[pygame.surface.Surface]) -> None:
+    def __init__(self, game: Game, sprites: list[pygame.surface.Surface], speed: float) -> None:
         self.game = game
         self.sprites = sprites
+        self.speed = speed
         # poślizg i tarcie są aktualizowane później zależnie od terenu po którym jedzie samochów
         self.poslizg = 0
         self.tarcie = 1
@@ -154,9 +155,9 @@ class Car:
         "Zmniejsza prędkość gracz. Używane do symulowania tarcie"
         self.velocity *= rate
 
-    def accelerate(self, speed: float) -> None:
+    def accelerate(self, rate: float) -> None:
         "Przyspiesza gracza w kierunku w który jest skierowany"
-        self.velocity += speed * self.direction_vector
+        self.velocity += self.speed * rate * self.direction_vector
 
     def recalculate_hitbox(self) -> None:
         "Przesuwa i obraca hitbox po przesunięciu lub obrocie gracza"
@@ -190,17 +191,17 @@ class PlayerCar(Car):
         # jazda do przodu
         # klawisze: strzałka do przodu lub W
         if keys[pygame.K_UP] or keys[pygame.K_w]:
-            self.accelerate(0.2)
+            self.accelerate(1)
         # jazda do tyłu
         # klawisze: strzałka do tyłu lub S
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            self.accelerate(-0.2)
+            self.accelerate(-1)
         # przyspieszenie nitro
         # klawisze: spacja
         if keys[pygame.K_SPACE]:
             if self.nitro >= 10:
                 self.nitro -= 5
-                self.accelerate(0.6)
+                self.accelerate(3)
         # Zostawienie przeszkody na torze (jeżeli dostępna)
         # klawisze: Z
         if keys[pygame.K_z]:
@@ -210,12 +211,12 @@ class PlayerCar(Car):
 
 class EnemyCar(Car):
     "Klasa abstrakcyjna dla wszystkich przeciwników"
-    def __init__(self, game: Game, sprites: list[pygame.surface.Surface], waypoints: list[CircleHitbox]) -> None:
+    def __init__(self, game: Game, sprites: list[pygame.surface.Surface], speed: float, waypoints: list[CircleHitbox]) -> None:
         """
         Funkcja inicjalizująca samochodu przyjmuje również listę
         punktów po których przeciwnik jeździ w kółko
         """
-        super().__init__(game, sprites)
+        super().__init__(game, sprites, speed)
         self.waypoints = waypoints
         self.next_target = 0
 
@@ -253,7 +254,7 @@ class EnemyCar(Car):
                 pass
             # jeżeli daleko to przyspiesza
             else:
-                self.accelerate(0.2)
+                self.accelerate(1)
 
 class EnemyCar1(EnemyCar):
     def update(self) -> None:
@@ -284,11 +285,11 @@ class EnemyCar2(EnemyCar):
             pass
         elif needed_rotation < 8:
             self.turn_left()
-            self.accelerate(0.2)
+            self.accelerate(1)
             return
         elif needed_rotation > 8:
             self.turn_right()
-            self.accelerate(0.2)
+            self.accelerate(1)
             return
 
 
@@ -332,9 +333,9 @@ class EnemyCar2(EnemyCar):
 
                 # jeżeli samochód nie skręcał w tej klatce to przyspiesza
             else:
-                self.accelerate(0.2)
+                self.accelerate(1)
         else:
-            self.accelerate(0.2)
+            self.accelerate(1)
 
         # zmniejszanie cooldownu reakcji na bliską ścianę
         self.close_wall_check_cooldown -= 1

@@ -103,14 +103,14 @@ class Game:
 
         sprites = self.sprites.copy()
 
-        self.cars.append(PlayerCar(self, sprites.pop(player_car_sprite)))
+        self.cars.append(PlayerCar(self, sprites.pop(player_car_sprite),0.2))
 
         random.shuffle(sprites)
 
-        self.cars.append(EnemyCar1(self, sprites.pop(), self.map.waypoints))
-        self.cars.append(EnemyCar2(self, sprites.pop(), self.map.waypoints))
-        self.cars.append(EnemyCar3(self, sprites.pop(), self.map.waypoints))
-        self.cars.append(EnemyCar4(self, sprites.pop(), self.map.waypoints))
+        self.cars.append(EnemyCar1(self, sprites.pop(), 0.2, self.map.waypoints))
+        self.cars.append(EnemyCar2(self, sprites.pop(), 0.2, self.map.waypoints))
+        self.cars.append(EnemyCar3(self, sprites.pop(), 0.2, self.map.waypoints))
+        self.cars.append(EnemyCar4(self, sprites.pop(), 0.2, self.map.waypoints))
 
         for i, car in enumerate(self.cars):
             car.map = self.map

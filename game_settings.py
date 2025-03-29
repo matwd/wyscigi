@@ -156,11 +156,11 @@ class GameSettings:
     def draw(self) -> None:
         # Odpowiednie ustawienie wszystkich przycisków, obrazków oraz napisów na ekranie
 
-        self.play_button.update(self.game.screen)
+        self.play_button.draw(self.game.screen)
         for car_btn in self.car_btns:
-            car_btn.update(self.game.screen)
+            car_btn.draw(self.game.screen)
         for map_btn in self.map_btns:
-            map_btn.update(self.game.screen)
+            map_btn.draw(self.game.screen)
         for index, map_img in enumerate(self.map_imgs):
 
             map_rect = map_img.get_rect(center=(380+(index*580),725))

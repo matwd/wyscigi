@@ -211,7 +211,7 @@ class PlayerCar(Car):
 
 class EnemyCar(Car):
     "Klasa abstrakcyjna dla wszystkich przeciwników"
-    def __init__(self, game: Game, sprites: list[pygame.surface.Surface], waypoints: list[CircleHitbox], speed: float) -> None:
+    def __init__(self, game: Game, sprites: list[pygame.surface.Surface], speed: float, waypoints: list[CircleHitbox]) -> None:
         """
         Funkcja inicjalizująca samochodu przyjmuje również listę
         punktów po których przeciwnik jeździ w kółko

@@ -39,8 +39,7 @@ class Game:
         pygame.font.init()
 
         # Inicjalizacja dźwięku
-        # self.sound = True
-        self.sound = False
+        self.sound = True
         try:
             pygame.mixer.init()
         except pygame.error:
@@ -237,7 +236,7 @@ class Game:
             self.screen.blit(lap_surface, (screen_width - lap_surface.get_width() - 25, 25))
 
 
-            self.draw_debug()
+            # self.draw_debug()
 
 
         elif self.state == GameState.end_screen:

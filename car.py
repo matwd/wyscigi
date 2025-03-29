@@ -27,6 +27,7 @@ class Car:
         self._direction = 0
         self.spin = 0
         self.nitro = 100
+        self.speed = 0
         self.hitbox = RectangleHitbox(self.x, self.y, 0, 80, 36)
         self.has_banana_peel = True
 
@@ -154,9 +155,13 @@ class Car:
         "Zmniejsza prędkość gracz. Używane do symulowania tarcie"
         self.velocity *= rate
 
-    def accelerate(self, speed: float) -> None:
+    def accelerate(self) -> None:
         "Przyspiesza gracza w kierunku w który jest skierowany"
-        self.velocity += speed * self.direction_vector
+        self.velocity += self.speed * self.direction_vector
+
+    def set_speed(self, new_speed: float) -> None:
+        "Zmienia wartość prędkości pojazdu"
+        self.speed = new_speed
 
     def recalculate_hitbox(self) -> None:
         "Przesuwa i obraca hitbox po przesunięciu lub obrocie gracza"
@@ -190,17 +195,20 @@ class PlayerCar(Car):
         # jazda do przodu
         # klawisze: strzałka do przodu lub W
         if keys[pygame.K_UP] or keys[pygame.K_w]:
-            self.accelerate(0.2)
+            self.set_speed(0.2)
+            self.accelerate()
         # jazda do tyłu
         # klawisze: strzałka do tyłu lub S
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            self.accelerate(-0.2)
+            self.set_speed(-0.2)
+            self.accelerate()
         # przyspieszenie nitro
         # klawisze: spacja
         if keys[pygame.K_SPACE]:
             if self.nitro >= 10:
                 self.nitro -= 5
-                self.accelerate(0.6)
+                self.set_speed(0.6)
+                self.accelerate()
         # Zostawienie przeszkody na torze (jeżeli dostępna)
         # klawisze: Z
         if keys[pygame.K_z]:
@@ -253,7 +261,8 @@ class EnemyCar(Car):
                 pass
             # jeżeli daleko to przyspiesza
             else:
-                self.accelerate(0.2)
+                self.set_speed(0.2)
+                self.accelerate()
 
 class EnemyCar1(EnemyCar):
     def update(self) -> None:
@@ -284,11 +293,13 @@ class EnemyCar2(EnemyCar):
             pass
         elif needed_rotation < 8:
             self.turn_left()
-            self.accelerate(0.2)
+            self.set_speed(0.2)
+            self.accelerate()
             return
         elif needed_rotation > 8:
             self.turn_right()
-            self.accelerate(0.2)
+            self.set_speed(0.2)
+            self.accelerate()
             return
 
 
@@ -332,9 +343,11 @@ class EnemyCar2(EnemyCar):
 
                 # jeżeli samochód nie skręcał w tej klatce to przyspiesza
             else:
-                self.accelerate(0.2)
+                self.set_speed(0.2)
+                self.accelerate()
         else:
-            self.accelerate(0.2)
+            self.set_speed(0.2)
+            self.accelerate()
 
         # zmniejszanie cooldownu reakcji na bliską ścianę
         self.close_wall_check_cooldown -= 1

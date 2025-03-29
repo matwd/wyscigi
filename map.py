@@ -24,6 +24,7 @@ class Map:
         self.hitbox = None
         self.background = None
         self.overlay = None
+        self.enemy_speed = 0
         self.waypoints = []
         self.obstacles = []
         self.progress_rectangles = []
@@ -55,6 +56,8 @@ class Map:
         # pobranie danych z jsona do zmiennej map_data
         with open(path.join(map_directory, "data.json")) as file:
             map_data = json.load(file)
+
+        self.enemy_speed = map_data["enemy_speed"]
 
         # Ładuje punkty do przejechania dla przeciwników
         for waypoint_cords in map_data["waypoints"]:

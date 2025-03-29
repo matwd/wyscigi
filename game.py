@@ -40,6 +40,7 @@ class Game:
 
         # Inicjalizacja dźwięku
         self.sound = True
+        # self.sound = False
         try:
             pygame.mixer.init()
         except pygame.error:
@@ -90,7 +91,7 @@ class Game:
         # inicjalizacja efektu opadania śniegu
         self.snowfall = Snowfall(-10, 20, 1.25, 2, 1920, 1080)
 
-        self.selected_map = 0
+        self.selected_map = 1
 
         self.map = Map(self.screen)
 

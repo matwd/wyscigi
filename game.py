@@ -91,6 +91,8 @@ class Game:
         # inicjalizacja efektu opadania śniegu
         self.snowfall = Snowfall(-10, 20, 1.25, 2, 1920, 1080)
 
+        self.crate_cooldown = 0
+
         self.selected_map = 1
 
         self.map = Map(self.screen)
@@ -156,6 +158,10 @@ class Game:
         self.init_cars(chosen_car-1)
 
     def start_race(self) -> None:
+        """
+        Zaczyna wyścig przez zrestartowanie licznika czasu
+        i ustawienie odpowiednigo stanu gry
+        """
         self.lap_times = [0, 0, 0]
         self.state = GameState.race
 
@@ -189,15 +195,22 @@ class Game:
             self.map.draw_background()
             self.map.barrier.update()
 
+            is_ctrl_pressed = pygame.key.get_mods() & pygame.KMOD_CTRL
             for event in events:
                 if event.type == pygame.KEYDOWN:
-                    keys = pygame.key.get_pressed()
-                    if keys[pygame.K_LCTRL] and keys[pygame.K_F1]:
-                        self.end_race()
+                    if is_ctrl_pressed:
+                        if event.key == pygame.K_F1:
+                            self.end_race()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     print(event.pos)
 
             self.update_cars()
+
+            if self.crate_cooldown <= 0:
+                self.map.add_crate()
+                self.crate_cooldown = 60 * 5
+
+            self.crate_cooldown -= 1
 
             self.map.draw_overlay()
 
@@ -230,6 +243,8 @@ class Game:
             lap_surface = self.font.render(f"{player.okrazenie + 1}/3", True, (255, 255, 255))
             self.screen.blit(lap_surface, (screen_width - lap_surface.get_width() - 25, 25))
 
+            player = [car for car in self.cars if isinstance(car, PlayerCar)][0]
+            player.draw_power_up()
 
             # self.draw_debug()
 
@@ -270,6 +285,11 @@ class Game:
             d.draw(self.screen)
 
     def update_cars(self) -> None:
+        "Funkcja aktualizuje auta i przetwarza kolizje między nimi"
+
+        # używamy tu techniki nazywanej w grach y-sorting
+        # auta które są niżej, a zarazem bliżej teoretycznej kamery
+        # są wyświetlane ostatnie żeby zakryć auta położone dalej
         self.cars.sort(key=lambda x: x.position.y)
         for car in self.cars:
             car.update()
@@ -288,6 +308,10 @@ class Game:
                     car.reduce_speed(0.1)
                     self.map.dissapearing_obstacles.remove(obstacle)
                     break
+
+            if self.map.crate and self.map.crate.check_hit(car):
+                self.map.crate = None
+                car.get_random_power_up()
 
             if self.map.progress_rectangles[car.track_progress].check_hit(car.position):
                 car.track_progress += 1

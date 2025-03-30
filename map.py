@@ -4,6 +4,7 @@ from os import path
 from hitbox import CircleHitbox, RectangleHitbox
 from vector import Vector
 from obstacle import Obstacle
+from crate import Crate
 import random
 import json
 
@@ -31,6 +32,7 @@ class Map:
         self.dissapearing_obstacles = []
         self.starting_points = []
         self.barrier = None
+        self.crate = None
         self.starting_x = 440
         self.starting_y = 440
         self.music = ""
@@ -122,11 +124,24 @@ class Map:
         return normal
 
     def draw_background(self) -> None:
+        """
+        Funkcja rysuje wszystkie rzeczy znajdujące się pod samochodami
+        """
         self.screen.blit(self.background, (0, 0))
         for obstacle in self.obstacles + self.dissapearing_obstacles:
             obstacle.draw()
+        if self.crate:
+            self.crate.draw()
 
     def draw_overlay(self) -> None:
+        """
+        Funkcja rysuje wszystkie rzeczy znajdujące się przed samochodami
+        """
         self.screen.blit(self.overlay, (0, 0))
         if self.barrier:
             self.barrier.draw(self.screen)
+
+    def add_crate(self) -> None:
+        crate_sprites = [pygame.image.load(f"assets/crate/crate{i:>04}.png") for i in range(1, 17)]
+        if not self.crate:
+            self.crate = Crate(self.screen, crate_sprites, Vector(1000, 200))

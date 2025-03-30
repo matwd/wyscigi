@@ -4,7 +4,7 @@ import itertools
 from main_menu import MainMenu
 from end_screen import EndScreen
 from results_screen import ResultsScreen
-from car import PlayerCar, EnemyCar1, EnemyCar2, EnemyCar3, EnemyCar4
+from car import PlayerCar, EnemyCar, EnemyCar1, EnemyCar2, EnemyCar3, EnemyCar4
 from snowfall import Snowfall
 from game_settings import GameSettings
 from countdown import CountdownScreen
@@ -100,6 +100,7 @@ class Game:
         self.music = pygame.mixer.music
 
         self.show_main()
+        # self.start_countdown(1, 1)
 
     def init_cars(self, player_car_sprite: int) -> None:
         self.cars = []
@@ -163,6 +164,9 @@ class Game:
         i ustawienie odpowiednigo stanu gry
         """
         self.lap_times = [0, 0, 0]
+        # gracz jest pierwszy
+        # za każdego przeciwnika który przejechał linię mety ta liczba jest zwiększana
+        self.player_rank = 1
         self.state = GameState.race
 
     def end_race(self) -> None:
@@ -192,8 +196,8 @@ class Game:
             self.main_menu.draw()
 
         elif self.state == GameState.race:
-            self.map.draw_background()
             self.map.barrier.update()
+            player = [car for car in self.cars if isinstance(car, PlayerCar)][0]
 
             is_ctrl_pressed = pygame.key.get_mods() & pygame.KMOD_CTRL
             for event in events:
@@ -206,46 +210,18 @@ class Game:
 
             self.update_cars()
 
+            if player.okrazenie < 3:
+                self.lap_times[player.okrazenie] += 1000 / 60
+
             if self.crate_cooldown <= 0:
                 self.map.add_crate()
                 self.crate_cooldown = 60 * 5
 
             self.crate_cooldown -= 1
 
-            self.map.draw_overlay()
-
-            if self.selected_map == 3:
-                self.snowfall.snowfall(self.screen, random.random() - 0.5)
+            self.draw_everything()
 
             self.time += 1000 / 60
-            text_surface = self.font.render(self.ms_to_sec(self.time), True, (255, 255, 255))
-            # self.screen.blit(text_surface, (self.screen.get_width() - 100 - text_surface.get_width(), 100))
-
-            player = filter(lambda x: isinstance(x, PlayerCar), self.cars).__iter__().__next__()
-
-            if player.okrazenie < 3:
-                self.lap_times[player.okrazenie] += 1000 / 60
-
-            screen_width = self.screen.get_width()
-
-            for i, time in enumerate(self.lap_times):
-                time_color = (123, 123, 123)
-                if (i == player.okrazenie):
-                    time_color = (255, 255, 255)
-
-                time_surface = self.font.render(self.ms_to_sec(time), True, time_color)    
-                time_width = time_surface.get_width()
-
-                space_for_time_text = 150
-
-                self.screen.blit(time_surface, (screen_width / 2 - time_width / 2 + space_for_time_text * (i - 1), 25))
-
-            lap_surface = self.font.render(f"{player.okrazenie + 1}/3", True, (255, 255, 255))
-            self.screen.blit(lap_surface, (screen_width - lap_surface.get_width() - 25, 25))
-
-            player = [car for car in self.cars if isinstance(car, PlayerCar)][0]
-            player.draw_power_up()
-
             # self.draw_debug()
 
 
@@ -276,6 +252,39 @@ class Game:
             if event.type == pygame.QUIT:
                 self.running = False
 
+    def draw_everything(self) -> None:
+        self.map.draw_background()
+
+        for car in self.cars:
+            car.draw()
+
+        # rysowanie wszystkiego przed autami
+        self.map.draw_overlay()
+        if self.selected_map == 3:
+            self.snowfall.snowfall(self.screen, random.random() - 0.5)
+
+        # rysowanie statystyk gracza (power-up i pasek nitro)
+        player = [car for car in self.cars if isinstance(car, PlayerCar)][0]
+        player.draw_stats()
+
+        # rysowanie czasu
+        screen_width = self.screen.get_width()
+        for i, time in enumerate(self.lap_times):
+            time_color = (123, 123, 123)
+            if (i == player.okrazenie):
+                time_color = (255, 255, 255)
+
+            time_surface = self.font.render(self.ms_to_sec(time), True, time_color)    
+            time_width = time_surface.get_width()
+
+            space_for_time_text = 150
+
+            self.screen.blit(time_surface, (screen_width / 2 - time_width / 2 + space_for_time_text * (i - 1), 8))
+
+        # rysowanie liczby okrążeń
+        lap_surface = self.font.render(f"{player.okrazenie + 1}/3", True, (255, 255, 255))
+        self.screen.blit(lap_surface, (screen_width - lap_surface.get_width() - 25, 8))
+
     def draw_debug(self) -> None:
         for car in self.cars:
             car.draw_debug()
@@ -293,7 +302,6 @@ class Game:
         self.cars.sort(key=lambda x: x.position.y)
         for car in self.cars:
             car.update()
-            car.draw()
 
             for obstacle in self.map.obstacles:
                 if car.spin <= 0 and obstacle.collides(car.position) and car.velocity.length() > 5:
@@ -319,14 +327,17 @@ class Game:
                     car.okrazenie += 1
                     car.track_progress = 0
 
-                    # if isinstance(car, PlayerCar):
-                    #     self.lap_times.append(self.time - sum(self.lap_times))
-
                     if car.okrazenie == 3 and isinstance(car, PlayerCar):
                         self.end_race()
 
+                    if car.okrazenie == 3 and isinstance(car, EnemyCar):
+                        car.ghost_cooldown = int(1e10)
+                        car.speed = 0
+                        self.player_rank += 1
+                        car.reduce_speed(0.3)
 
         for car1, car2 in itertools.combinations(self.cars, 2):
+            if car1.is_ghost() or car2.is_ghost(): continue
             intersecting = False
             if (car1.position - car2.position).length() > 100:
                 # jezeli auta są daleko od siebie to nie sprawdzamy kolizji

@@ -1,5 +1,6 @@
 from vector import Vector
 import pygame
+import pygame.gfxdraw
 
 class Hitbox:
     """
@@ -22,7 +23,8 @@ class CircleHitbox(Hitbox):
         self.radius = radius
 
     def draw(self, screen: pygame.surface.Surface) -> None:
-        pygame.draw.circle(screen, (255, 0, 0, 0), tuple(self.position), self.radius)
+        # pygame.draw.circle(screen, (255, 0, 0, 0), tuple(), self.radius)
+        pygame.gfxdraw.filled_circle(screen, *self.position, self.radius, (255, 0, 0, 127))
 
     def check_hit(self, point: Vector) -> bool:
         return (self.position - point).length() < self.radius

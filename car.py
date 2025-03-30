@@ -25,6 +25,7 @@ class Car:
         self.nitro = 100
         self.hitbox = RectangleHitbox(self.x, self.y, 0, 80, 36)
         self.power_up = None
+        self.ghost_cooldown = 0
 
     @property
     def direction(self) -> int:
@@ -56,6 +57,9 @@ class Car:
     def y(self, value: int) -> None:
         self.position.y = value
         self.recalculate_hitbox()
+
+    def is_ghost(self) -> bool:
+        return self.ghost_cooldown > 0
 
     def is_going_forward(self) -> bool:
         return self.direction_vector.scalar_product(self.velocity) > 0
@@ -110,6 +114,9 @@ class Car:
         if self.nitro < 100:
             self.nitro += 0.1
 
+        if self.ghost_cooldown > 0:
+            self.ghost_cooldown -= 1
+
         self.recalculate_hitbox()
         self.rotation_cooldown -= 1
 
@@ -117,10 +124,10 @@ class Car:
         "Rysowanie samochodu"
         rect = self.sprites[0].get_rect()
         image_rect = pygame.Rect(self.x-rect.width/2, self.y-rect.width/2+random.randint(-1, 1), 256, 256)
-        self.game.screen.blit(self.sprites[self.direction], image_rect)
-
-        pygame.draw.rect(self.game.screen, (0, 0, 0), (self.x - 50, self.y - 50, 100, 10), border_radius=4)
-        pygame.draw.rect(self.game.screen, (0, 0, 240), (self.x - 50, self.y - 50, self.nitro, 10), border_radius=4)
+        if self.is_ghost():
+            self.game.screen.blit(self.sprites[self.direction], image_rect, special_flags=pygame.BLEND_ADD)
+        else:
+            self.game.screen.blit(self.sprites[self.direction], image_rect)
 
         self.hitbox.pos = self.position.copy()
 
@@ -207,11 +214,15 @@ class PlayerCar(Car):
                 self.power_up.use()
                 self.power_up = None
 
-    def draw_power_up(self) -> None:
+    def draw_stats(self) -> None:
         "rysowanie kółka z obecnym power-upem w lewym górnym rogu ekranu"
         pygame.gfxdraw.filled_circle(self.game.screen, 70, 70, 64, (0, 0, 0, 127))
         if self.power_up:
             self.power_up.draw(self.game.screen)
+
+        pygame.draw.rect(self.game.screen, (0, 0, 0), (160, 20, 200, 20), border_radius=4)
+        pygame.draw.rect(self.game.screen, (0, 0, 240), (160, 20, self.nitro * 2, 20), border_radius=4)
+
 
 class EnemyCar(Car):
     "Klasa abstrakcyjna dla wszystkich przeciwników"
@@ -367,7 +378,7 @@ class EnemyCar3(EnemyCar):
 
         target = self.waypoints[self.next_target].position
 
-        player = filter(lambda x: isinstance(x, PlayerCar), self.game.cars).__iter__().__next__()
+        player = [car for car in self.game.cars if isinstance(car, PlayerCar)][0]
         to_player_vector = player.position - self.position
         try_to_hit_player = False
         if player.velocity.length() > 3:

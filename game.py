@@ -91,6 +91,8 @@ class Game:
         # inicjalizacja efektu opadania śniegu
         self.snowfall = Snowfall(-10, 20, 1.25, 2, 1920, 1080)
 
+        self.crate_cooldown = 0
+
         self.selected_map = 1
 
         self.map = Map(self.screen)
@@ -204,7 +206,12 @@ class Game:
 
             self.update_cars()
 
-            self.map.add_crate()
+            if self.crate_cooldown <= 0:
+                self.map.add_crate()
+                self.crate_cooldown = 60 * 5
+
+            self.crate_cooldown -= 1
+
             self.map.draw_overlay()
 
             if self.selected_map == 3:

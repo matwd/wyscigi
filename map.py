@@ -139,6 +139,6 @@ class Map:
             self.barrier.draw(self.screen)
 
     def add_crate(self) -> None:
-        crate_sprite = pygame.image.load("./assets/plama_oleju.png").convert_alpha()
+        crate_sprites = [pygame.image.load(f"assets/crate/crate{i:>04}.png") for i in range(1, 17)]
         if not self.crate:
-            self.crate = Crate(self.screen, crate_sprite, Vector(1000, 200))
+            self.crate = Crate(self.screen, crate_sprites, Vector(1000, 200))

@@ -173,6 +173,7 @@ class Game:
         self.state = GameState.end_screen
 
     def show_result(self) -> None:
+        self.results_screen.load_map(self.selected_map)
         self.state = GameState.result_screen
 
     def show_main(self) -> None:

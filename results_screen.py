@@ -114,6 +114,7 @@ class ResultsScreen:
 
         self.prev_map_button.draw(self.game.screen)
         self.next_map_button.draw(self.game.screen)
+        self.close_button.draw(self.game.screen)
 
         for i, result in enumerate(ranking):
             # paginacji ciąg dalszy
@@ -137,6 +138,6 @@ class ResultsScreen:
 
             self.prev_page_button.draw(self.game.screen)
             self.next_page_button.draw(self.game.screen)
-            self.close_button.draw(self.game.screen)
+            
 
 

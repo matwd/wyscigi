@@ -53,7 +53,7 @@ class ResultsScreen:
         else:
             self.prev_page_button.changeColor(mouse_pos)
 
-        if self.page == self.max_page:
+        if self.page == self.max_page or self.max_page == -1:
             self.next_page_button.changeColor(mouse_pos, True)
         else:
             self.next_page_button.changeColor(mouse_pos)

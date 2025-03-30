@@ -196,11 +196,12 @@ class Game:
             self.map.draw_background()
             self.map.barrier.update()
 
+            is_ctrl_pressed = pygame.key.get_mods() & pygame.KMOD_CTRL
             for event in events:
                 if event.type == pygame.KEYDOWN:
-                    keys = pygame.key.get_pressed()
-                    if keys[pygame.K_LCTRL] and keys[pygame.K_F1]:
-                        self.end_race()
+                    if is_ctrl_pressed:
+                        if event.key == pygame.K_F1:
+                            self.end_race()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     print(event.pos)
 

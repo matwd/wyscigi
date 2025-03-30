@@ -38,7 +38,6 @@ class EndScreen:
                         # jeśli nie ma pliku to go tworzy z pustymi arrayem json
                         with open("results.json", "w") as file:
                             json.dump(results, file)
-                            # file.write("{map0: [], map1: [], map2: []}")
 
                     results[f"map{self.game.selected_map}"].append({"name": self.name, "time": float(self.game.ms_to_sec(self.game.time))})
 
@@ -51,15 +50,19 @@ class EndScreen:
                     self.name += event.unicode
 
     def draw(self) -> None:
+        # draws background and black rectangle in the middle of the screen
         self.game.screen.blit(self.bg, (0, 0))
         pygame.draw.rect(self.game.screen, (0, 0, 0), self.smallerBg)
 
+        # draws text with time
         time_surface = self.font.render(f"Your time: {self.game.ms_to_sec(self.game.time)}s", True, (255, 255, 255))
         self.game.screen.blit(time_surface, (self.screen_width // 2 - time_surface.get_width() // 2, self.screen_height // 4))
 
+        # draws text with prompt to enter name
         enter_name_surface = self.font.render("Enter your name:", True, (255, 255, 255))
         self.game.screen.blit(enter_name_surface, (self.screen_width // 2 - enter_name_surface.get_width() // 2, self.screen_height // 4 + 50))
 
+        # draws text with name
         name_surface = self.font.render(self.name, True, (255, 255, 255))
         self.game.screen.blit(name_surface, (self.screen_width // 2 - name_surface.get_width() // 2, self.screen_height // 4 + 100))
 

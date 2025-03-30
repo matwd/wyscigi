@@ -37,5 +37,6 @@
     [200, 500, 12],
     [250, 700, 12]
   ],
-  "enemy_speed": 0.25
+  "enemy_speed": 0.25,
+  "music": "level_1.mp3"
 }

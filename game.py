@@ -10,8 +10,6 @@ from game_settings import GameSettings
 from countdown import CountdownScreen
 from map import Map
 
-import json
-
 class GameState():
     """
     Klasa/Enum używany do obsługi obecnego stanu gry

@@ -20,11 +20,13 @@ class ResultsScreen:
 
         self.title_text = self.fontBig.render("Petrol City", True, (255, 255, 255))
 
-        self.prev_page_button = Button((self.screen_width // 4 + 20, self.screen_height // 4 + 50 * self.results_per_page + 10 + self.title_text.get_height()), "(<-) PREVIOUS PAGE", self.font, (255, 255, 255), (86, 86, 86), self.game.real_screen, Cords.topleft)
-        self.next_page_button = Button((self.screen_width // 4 + self.resultsBg.width - 20, self.screen_height // 4 + 50 * self.results_per_page + 10 + self.title_text.get_height()), "NEXT PAGE (->)", self.font, (255, 255, 255), (86, 86, 86), self.game.real_screen, Cords.topright)
+        self.prev_page_button = Button((self.screen_width // 4 + 20, self.screen_height // 4 + 50 * self.results_per_page + 10 + self.title_text.get_height()), "PREVIOUS PAGE", self.font, (255, 255, 255), (86, 86, 86), self.game.real_screen, Cords.topleft)
+        self.next_page_button = Button((self.screen_width // 4 + self.resultsBg.width - 20, self.screen_height // 4 + 50 * self.results_per_page + 10 + self.title_text.get_height()), "NEXT PAGE", self.font, (255, 255, 255), (86, 86, 86), self.game.real_screen, Cords.topright)
 
         self.prev_map_button = Button((self.screen_width // 4 + 20, self.screen_height // 4), "<", self.fontBig, (255, 255, 255), (86, 86, 86), self.game.real_screen, Cords.topleft)
         self.next_map_button = Button((self.screen_width // 4 + self.resultsBg.width - 20, self.screen_height // 4), ">", self.fontBig, (255, 255, 255), (86, 86, 86), self.game.real_screen, Cords.topright)
+
+        self.close_button = Button((self.screen_width // 4 + 10, self.screen_height // 4), "X", self.font, (255, 255, 255), (255, 0, 0), self.game.real_screen, Cords.topleft)
     
     def next_map(self):
         self.game.selected_map = min(3, self.game.selected_map + 1)
@@ -65,21 +67,24 @@ class ResultsScreen:
             self.next_map_button.changeColor(mouse_pos, True)
         else:
             self.next_map_button.changeColor(mouse_pos)
-            
+        self.close_button.changeColor(mouse_pos)    
+
         for event in events:
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    self.next_map()
-                if event.key == pygame.K_DOWN:
-                    self.prev_map()
-                if event.key == pygame.K_RIGHT:
-                    self.next_page()
-                if event.key == pygame.K_LEFT:
+                if event.key in (pygame.K_UP, pygame.K_w):
                     self.prev_page()
+                if event.key in (pygame.K_DOWN, pygame.K_s):
+                    self.next_page()
+                if event.key in (pygame.K_RIGHT, pygame.K_d):
+                    self.next_map()
+                if event.key in (pygame.K_LEFT, pygame.K_a):
+                    self.prev_map()
                 if event.key == pygame.K_RETURN:
                     self.game.selected_map = 1
                     self.game.show_main()
             if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.close_button.checkForInput(mouse_pos):
+                    self.game.show_main()
                 if self.next_map_button.checkForInput(mouse_pos):
                     self.next_map()
                 if self.prev_map_button.checkForInput(mouse_pos):
@@ -123,6 +128,7 @@ class ResultsScreen:
 
         self.prev_map_button.draw(self.game.screen)
         self.next_map_button.draw(self.game.screen)
+        self.close_button.draw(self.game.screen)
 
         for i, result in enumerate(ranking):
             # paginacji ciąg dalszy

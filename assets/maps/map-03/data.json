@@ -33,5 +33,6 @@
     [700, 950, 8],
     [750, 850, 8]
   ],
-  "enemy_speed": 0.3
+  "enemy_speed": 0.3,
+  "music": "level_3.ogg"
 }

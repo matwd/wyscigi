@@ -1,10 +1,6 @@
-from __future__ import annotations
 from vector import Vector
-import math
-import pygame
-import random
 from hitbox import CircleHitbox
-from obstacle import Obstacle
+import pygame
 
 class Crate:
     def __init__(self, screen: pygame.surface.Surface, sprites: list[pygame.surface.Surface], position: Vector) -> None:

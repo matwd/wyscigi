@@ -20,11 +20,13 @@ class ResultsScreen:
 
         self.title_text = self.fontBig.render("Petrol City", True, (255, 255, 255))
 
-        self.prev_page_button = Button((self.screen_width // 4 + 20, self.screen_height // 4 + 50 * self.results_per_page + 10 + self.title_text.get_height()), "(<-) PREVIOUS PAGE", self.font, (255, 255, 255), (86, 86, 86), self.game.real_screen, Cords.topleft)
-        self.next_page_button = Button((self.screen_width // 4 + self.resultsBg.width - 20, self.screen_height // 4 + 50 * self.results_per_page + 10 + self.title_text.get_height()), "NEXT PAGE (->)", self.font, (255, 255, 255), (86, 86, 86), self.game.real_screen, Cords.topright)
+        self.prev_page_button = Button((self.screen_width // 4 + 20, self.screen_height // 4 + 50 * self.results_per_page + 10 + self.title_text.get_height()), "PREVIOUS PAGE", self.font, (255, 255, 255), (86, 86, 86), self.game.real_screen, Cords.topleft)
+        self.next_page_button = Button((self.screen_width // 4 + self.resultsBg.width - 20, self.screen_height // 4 + 50 * self.results_per_page + 10 + self.title_text.get_height()), "NEXT PAGE", self.font, (255, 255, 255), (86, 86, 86), self.game.real_screen, Cords.topright)
 
         self.prev_map_button = Button((self.screen_width // 4 + 20, self.screen_height // 4), "<", self.fontBig, (255, 255, 255), (86, 86, 86), self.game.real_screen, Cords.topleft)
         self.next_map_button = Button((self.screen_width // 4 + self.resultsBg.width - 20, self.screen_height // 4), ">", self.fontBig, (255, 255, 255), (86, 86, 86), self.game.real_screen, Cords.topright)
+
+        self.close_button = Button((self.screen_width // 4 + 10, self.screen_height // 4), "X", self.font, (255, 255, 255), (255, 0, 0), self.game.real_screen, Cords.topleft)
 
     def update(self, events: list[pygame.event.Event]) -> None:
         mouse_pos = pygame.mouse.get_pos()
@@ -47,25 +49,28 @@ class ResultsScreen:
             self.next_map_button.changeColor(mouse_pos, True)
         else:
             self.next_map_button.changeColor(mouse_pos)
-            
+        self.close_button.changeColor(mouse_pos)    
+        
         for event in events:
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
+                if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     self.game.selected_map = min(3, self.game.selected_map + 1)
                     self.page = 0
                     self.max_page = -1
-                if event.key == pygame.K_DOWN:
+                if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     self.game.selected_map = max(1, self.game.selected_map - 1)
                     self.page = 0
                     self.max_page = -1
-                if event.key == pygame.K_LEFT:
+                if event.key == pygame.K_UP or event.key == pygame.K_w:
                     self.page = max(0, self.page - 1)
-                if event.key == pygame.K_RIGHT:
+                if event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     self.page = min(self.max_page, self.page + 1)
                 if event.key == pygame.K_RETURN:
                     self.game.selected_map = 1
                     self.game.show_main()
             if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.close_button.checkForInput(mouse_pos):
+                    self.game.show_main()
                 if self.prev_page_button.checkForInput(mouse_pos):
                     self.page = max(0, self.page - 1)
                 if self.next_page_button.checkForInput(mouse_pos):
@@ -132,5 +137,6 @@ class ResultsScreen:
 
             self.prev_page_button.draw(self.game.screen)
             self.next_page_button.draw(self.game.screen)
+            self.close_button.draw(self.game.screen)
 
 

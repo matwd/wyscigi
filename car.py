@@ -5,13 +5,8 @@ import pygame
 import random
 from hitbox import RectangleHitbox
 from obstacle import Obstacle
-
-class PowerUp:
-    def __init__(self, sprite: pygame.surface.Surface) -> None:
-        self.sprite = sprite
-
-    def use_on_car(self, car: Car) -> None:
-        pass
+import pygame.gfxdraw
+from power_up import BananaPeel
 
 class Car:
     "Klasa Samochodu z której dziedziczą klasy gracza i przeciwników"
@@ -29,7 +24,7 @@ class Car:
         self.spin = 0
         self.nitro = 100
         self.hitbox = RectangleHitbox(self.x, self.y, 0, 80, 36)
-        self.has_banana_peel = True
+        self.power_up = None
 
     @property
     def direction(self) -> int:
@@ -170,6 +165,9 @@ class Car:
         banana_texture = pygame.image.load("./assets/banana.png").convert_alpha()
         self.game.map.dissapearing_obstacles.append(Obstacle(self.game, self.position - self.direction_vector.normalize() * 60, banana_texture))
 
+    def get_random_power_up(self) -> None:
+        self.power_up = BananaPeel(self)
+
 class PlayerCar(Car):
     "Klasa auta gracza"
     def update(self) -> None:
@@ -205,9 +203,15 @@ class PlayerCar(Car):
         # Zostawienie przeszkody na torze (jeżeli dostępna)
         # klawisze: Z
         if keys[pygame.K_z]:
-            if self.has_banana_peel:
-                self.leave_obstacle()
-                self.has_banana_peel = False
+            if self.power_up:
+                self.power_up.use()
+                self.power_up = None
+
+    def draw_power_up(self) -> None:
+        "rysowanie kółka z obecnym power-upem w lewym górnym rogu ekranu"
+        pygame.gfxdraw.filled_circle(self.game.screen, 70, 70, 64, (0, 0, 0, 127))
+        if self.power_up:
+            self.power_up.draw(self.game.screen)
 
 class EnemyCar(Car):
     "Klasa abstrakcyjna dla wszystkich przeciwników"
@@ -361,13 +365,11 @@ class EnemyCar3(EnemyCar):
     def update(self) -> None:
         super().update()
 
-        # target = Vector(*pygame.mouse.get_pos())
         target = self.waypoints[self.next_target].position
 
         player = filter(lambda x: isinstance(x, PlayerCar), self.game.cars).__iter__().__next__()
         to_player_vector = player.position - self.position
         try_to_hit_player = False
-        # print(player.velocity.length(), to_player_vector, to_player_vector.length())
         if player.velocity.length() > 3:
             if to_player_vector.length() < 200 and self.direction_vector.scalar_product(player) > 0:
                 try_to_hit_player = True
@@ -382,9 +384,6 @@ class EnemyCar3(EnemyCar):
         self.turn_to_target(target)
 
         target = self.waypoints[self.next_target]
-        # for index, point in enumerate(self.waypoints):
-        #     if point.check_hit(self.position):
-        #         self.next_target = (index + 1) % len(self.waypoints)
 
 
     def draw(self) -> None:

@@ -136,19 +136,24 @@ class Game:
             # print(a)
         pygame.quit()
 
-    def open_settings(self) -> None:
-        self.state = GameState.game_settings
-
-    def start_countdown(self, map: Map, chosen_car: int) -> None:
+    def change_music(self, music: str) -> None:
         if self.sound:
             self.music.stop()
             self.music.unload()
 
-            self.music.load("./assets/music/level_1.mp3")
+            self.music.load(f"assets/music/{music}")
             self.music.play(-1)
+
+
+    def open_settings(self) -> None:
+        self.state = GameState.game_settings
+
+    def start_countdown(self, map: Map, chosen_car: int) -> None:
         self.state = GameState.starting_countdown
         self.selected_map = map
         self.map.load_from_directory(f"assets/maps/map-{map:02}", map)
+
+        self.change_music(self.map.music)
 
         self.init_cars(chosen_car-1)
 
@@ -167,13 +172,7 @@ class Game:
         self.state = GameState.result_screen
 
     def show_main(self) -> None:
-        if self.sound:
-
-            self.music.stop()
-            self.music.unload()
-
-            self.music.load("assets/music/menu.mp3")
-            self.music.play(-1)
+        self.change_music("menu.mp3")
 
         self.state = GameState.main_menu
 

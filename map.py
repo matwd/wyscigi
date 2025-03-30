@@ -35,6 +35,7 @@ class Map:
         self.crate = None
         self.starting_x = 440
         self.starting_y = 440
+        self.music = ""
 
     def load_from_directory(self, map_directory: str, level: int) -> None:
         """
@@ -78,6 +79,8 @@ class Map:
             self.progress_rectangles.append(RectangleHitbox(*rectangle_data))
 
         self.starting_points = map_data["starting_points"]
+
+        self.music = map_data["music"]
 
     def is_point_on_track(self, vec: Vector) -> bool:
         rect = self.hitbox.get_rect()

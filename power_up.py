@@ -23,7 +23,7 @@ class BananaPeel(PowerUp):
 
 
 class Ghost(PowerUp):
-    sprite_path = "assets/car-sprites/car-01/0001.png"
+    sprite_path = "assets/ghost.png"
 
     def use(self) -> None:
         self.car.ghost_cooldown = 180

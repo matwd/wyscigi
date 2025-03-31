@@ -108,6 +108,11 @@ class Game:
         self.cars = []
 
         sprites = self.sprites.copy()
+        for i in range(0, 5):
+            for j in range(0,15):
+                sprites[i][j] = pygame.transform.scale(sprites[i][j],[32,32])
+                sprites[i][j] = pygame.transform.scale(sprites[i][j],[128,128])
+                # sprite = pygame.transform.scale(sprite,[64,64])
 
         self.cars.append(PlayerCar(self, sprites.pop(player_car_sprite),0.2))
 

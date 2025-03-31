@@ -23,6 +23,7 @@ class CountdownScreen:
                 self.game.start_race()
                 self.time = 4
             self.time_text = self.font.render(str(self.time), True, (255,255,255))
+            self.time_text_rect = self.time_text.get_rect(center=(960, 540))
             self.last_frame_time = current_time
 
 

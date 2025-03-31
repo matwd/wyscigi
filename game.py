@@ -53,7 +53,7 @@ class Game:
         pygame.display.set_icon(icon)
 
         # otwarcie okna gry
-        self.real_screen = pygame.display.set_mode([1920, 1080], pygame.RESIZABLE)
+        self.real_screen = pygame.display.set_mode([1440, 810], pygame.RESIZABLE)
 
         # Tekstura na którą wszystko jest rysowane
         # jest potem skalowana do rozmiaru okna gry
@@ -91,13 +91,15 @@ class Game:
         # inicjalizacja efektu opadania śniegu
         self.snowfall = Snowfall(-10, 20, 1.25, 2, 1920, 1080)
 
-        self.crate_cooldown = 0
+        # pierwsza skrzynka pojawia się po 3 sekundach
+        self.crate_cooldown = 60 * 3
 
         self.selected_map = 1
 
         self.map = Map(self.screen)
 
         self.music = pygame.mixer.music
+        self.last_music = ""
 
         self.show_main()
         # self.start_countdown(1, 1)
@@ -138,12 +140,20 @@ class Game:
         pygame.quit()
 
     def change_music(self, music: str) -> None:
+        """
+        Zmiana muzyki lecącej w tle
+        Parametry:
+            music (str): nazwa pliku z muzyką znajdującego się w katalogu ./assets/music/
+        """
+        # jeżeli muzyka jest taka sama jak obecnie lecąca muzyka to nic się nie dzieje
+        if self.last_music == music: return
         if self.sound:
             self.music.stop()
             self.music.unload()
 
             self.music.load(f"assets/music/{music}")
             self.music.play(-1)
+            self.last_music = music
 
 
     def open_settings(self) -> None:

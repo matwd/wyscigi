@@ -4,6 +4,7 @@ from os import path
 from hitbox import CircleHitbox, RectangleHitbox
 from vector import Vector
 from obstacle import Obstacle
+from crate import Crate
 import random
 import json
 
@@ -14,7 +15,7 @@ class Map:
     kolizji z torem, oraz obiekty znajdące się na torze np. przeszkody itp
     """
     # def __init__(self, screen, track_filename, overlay_filename, hitbox_filename, starting_x, starting_y):
-    def __init__(self, screen):
+    def __init__(self, screen: pygame.surface.Surface) -> None:
         """
         Inicjalizacja obiekty Map, ale bez ładowania tekstur i hitboxów.
         Te muszą zostać załadowane metodą load_from_directory
@@ -24,16 +25,19 @@ class Map:
         self.hitbox = None
         self.background = None
         self.overlay = None
+        self.enemy_speed = 0
         self.waypoints = []
         self.obstacles = []
         self.progress_rectangles = []
         self.dissapearing_obstacles = []
         self.starting_points = []
         self.barrier = None
+        self.crate = None
         self.starting_x = 440
         self.starting_y = 440
+        self.music = ""
 
-    def load_from_directory(self, map_directory, level):
+    def load_from_directory(self, map_directory: str, level: int) -> None:
         """
         Matoda ładuje dane o danym torze.
         Argument map_directory to ścieżka do folderu z danymi toru.
@@ -48,6 +52,7 @@ class Map:
         # czyszczenie tablic
         self.waypoints = []
         self.obstacles = []
+        self.crates = []
         self.progress_rectangles = []
         self.dissapearing_obstacles = []
         self.starting_points = []
@@ -55,6 +60,8 @@ class Map:
         # pobranie danych z jsona do zmiennej map_data
         with open(path.join(map_directory, "data.json")) as file:
             map_data = json.load(file)
+
+        self.enemy_speed = map_data["enemy_speed"]
 
         # Ładuje punkty do przejechania dla przeciwników
         for waypoint_cords in map_data["waypoints"]:
@@ -65,6 +72,8 @@ class Map:
         for obstacle_cords in map_data["obstacles"][:2+level]:
             self.obstacles.append(Obstacle(self, Vector(*obstacle_cords), obstacle_texture))
 
+        for crate_cords in map_data["crates"]:
+            self.crates.append(Vector(*crate_cords))
         # Ładowanie szlabanu
         self.barrier = Barrier(*map_data["barrier"])
 
@@ -74,7 +83,9 @@ class Map:
 
         self.starting_points = map_data["starting_points"]
 
-    def is_point_on_track(self, vec):
+        self.music = map_data["music"]
+
+    def is_point_on_track(self, vec: Vector) -> bool:
         rect = self.hitbox.get_rect()
 
         # sprawdź czy nie uderzono w szlaban
@@ -87,10 +98,10 @@ class Map:
 
         return False
 
-    def get_ground_params(self, vec) -> ("tarcie", "starowność"):
+    def get_ground_params(self, vec: Vector) -> tuple[float, float]:
         normal = (0.1, 0.99)
         ice = (0.2, 0.996)
-        sand = (0.05, 0.99)
+        sand = (0.05, 0.98)
         rect = self.hitbox.get_rect()
 
         if 0 < vec.x < rect.width and 0 < vec.y < rect.height:
@@ -109,14 +120,32 @@ class Map:
             if hitbox_color == (0, 0, 255, 255):
                 return ice
 
+            # kolor ̣̣żółty oznacza piasek (większe tarcie)
+            if hitbox_color == (255, 255, 0, 255):
+                return sand
+
         return normal
 
-    def draw_background(self):
+    def draw_background(self) -> None:
+        """
+        Funkcja rysuje wszystkie rzeczy znajdujące się pod samochodami
+        """
         self.screen.blit(self.background, (0, 0))
         for obstacle in self.obstacles + self.dissapearing_obstacles:
             obstacle.draw()
+        if self.crate:
+            self.crate.draw()
 
-    def draw_overlay(self):
+    def draw_overlay(self) -> None:
+        """
+        Funkcja rysuje wszystkie rzeczy znajdujące się przed samochodami
+        """
         self.screen.blit(self.overlay, (0, 0))
         if self.barrier:
             self.barrier.draw(self.screen)
+
+    def add_crate(self) -> None:
+        crate_sprites = [pygame.image.load(f"assets/crate/crate{i:>04}.png") for i in range(1, 17)]
+        if not self.crate:
+            random.shuffle(self.crates)
+            self.crate = Crate(self.screen, crate_sprites, self.crates[0])

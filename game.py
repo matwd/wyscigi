@@ -1,17 +1,13 @@
 import pygame
 import random
 import itertools
-import json
-from os import path
 from main_menu import MainMenu
 from end_screen import EndScreen
 from results_screen import ResultsScreen
-from car import PlayerCar, EnemyCar1, EnemyCar2, EnemyCar3, EnemyCar4
-from obstacle import Obstacle
+from car import PlayerCar, EnemyCar, EnemyCar1, EnemyCar2, EnemyCar3, EnemyCar4
 from snowfall import Snowfall
-from vector import Vector
 from game_settings import GameSettings
-from barrier import Barrier
+from countdown import CountdownScreen
 from map import Map
 
 class GameState():
@@ -22,12 +18,14 @@ class GameState():
     main_menu = 0
     # wybór opcji gry
     game_settings = 1
+    # odliczanie do zaczecia gry
+    starting_countdown = 2
     # trwa wyścig
-    race = 2
+    race = 3
     # zakończenie wyścigu
-    end_screen = 3
+    end_screen = 4
     # ekran z wynikami
-    result_screen = 4
+    result_screen = 5
 
 debug = True
 
@@ -35,13 +33,14 @@ class Game:
     """
     Klasa gry. Obsługuje pętle główną i zamykanie okna gry
     """
-    def __init__(self):
+    def __init__(self) -> None:
         # Inicjalizowanie biblioteki pygame i otworzenie okna
         pygame.init()
         pygame.font.init()
 
         # Inicjalizacja dźwięku
         self.sound = True
+        # self.sound = False
         try:
             pygame.mixer.init()
         except pygame.error:
@@ -87,31 +86,35 @@ class Game:
         self.game_settings = GameSettings(self)
         self.end_screen = EndScreen(self)
         self.results_screen = ResultsScreen(self)
+        self.countdown_screen = CountdownScreen(self)
 
         # inicjalizacja efektu opadania śniegu
         self.snowfall = Snowfall(-10, 20, 1.25, 2, 1920, 1080)
 
-        self.selected_map = 0
+        self.crate_cooldown = 0
+
+        self.selected_map = 1
 
         self.map = Map(self.screen)
 
         self.music = pygame.mixer.music
 
         self.show_main()
+        # self.start_countdown(1, 1)
 
-    def init_cars(self, player_car_sprite):
+    def init_cars(self, player_car_sprite: int) -> None:
         self.cars = []
 
         sprites = self.sprites.copy()
 
-        self.cars.append(PlayerCar(self, sprites.pop(player_car_sprite)))
+        self.cars.append(PlayerCar(self, sprites.pop(player_car_sprite),0.2))
 
         random.shuffle(sprites)
 
-        self.cars.append(EnemyCar1(self, sprites.pop(), self.map.waypoints))
-        self.cars.append(EnemyCar2(self, sprites.pop(), self.map.waypoints))
-        self.cars.append(EnemyCar3(self, sprites.pop(), self.map.waypoints))
-        self.cars.append(EnemyCar4(self, sprites.pop(), self.map.waypoints))
+        self.cars.append(EnemyCar1(self, sprites.pop(), self.map.enemy_speed, self.map.waypoints))
+        self.cars.append(EnemyCar2(self, sprites.pop(), self.map.enemy_speed, self.map.waypoints))
+        self.cars.append(EnemyCar3(self, sprites.pop(), self.map.enemy_speed, self.map.waypoints))
+        self.cars.append(EnemyCar4(self, sprites.pop(), self.map.enemy_speed, self.map.waypoints))
 
         for i, car in enumerate(self.cars):
             car.map = self.map
@@ -121,7 +124,7 @@ class Game:
             car.track_progress = 0
 
 
-    def run(self):
+    def run(self) -> None:
         """
         Gra po uruchomieniu wywołuje pętlę główną gry 60 razy na sekundę
         aż do ustawienia zmienner self.running na False
@@ -134,51 +137,62 @@ class Game:
             # print(a)
         pygame.quit()
 
-    def open_settings(self):
+    def change_music(self, music: str) -> None:
+        if self.sound:
+            self.music.stop()
+            self.music.unload()
+
+            self.music.load(f"assets/music/{music}")
+            self.music.play(-1)
+
+
+    def open_settings(self) -> None:
         self.state = GameState.game_settings
 
-    def start_race(self, map, chosen_car):
+    def start_countdown(self, map: Map, chosen_car: int) -> None:
+        """
+        Zaczyna odliczanie czasu do rozpoczęcia wyścigu przez ustawienie odpowiedniego stanu gry,
+        ładuje auta oraz mapę i restartuje licznik czasu
+        """
+        self.time = 0
+        self.lap_times = [0, 0, 0]
+        self.state = GameState.starting_countdown
         self.selected_map = map
         self.map.load_from_directory(f"assets/maps/map-{map:02}", map)
 
+        self.change_music(self.map.music)
+
         self.init_cars(chosen_car-1)
-        self.lap_times = [0, 0, 0]
 
-
-        if self.sound:
-            self.music.stop()
-            self.music.unload()
-
-            self.music.load("./assets/music/level_1.mp3")
-            self.music.play(-1)
-
+    def start_race(self) -> None:
+        """
+        Zaczyna wyścig przez ustawienie odpowiednigo stanu gry
+        """
+        
+        # gracz jest pierwszy
+        # za każdego przeciwnika który przejechał linię mety ta liczba jest zwiększana
+        self.player_rank = 1
         self.state = GameState.race
 
-    def end_race(self):
-        # self.time = random.randint(2000, 5000) / 100
+    def end_race(self) -> None:
         self.state = GameState.end_screen
 
-    def show_result(self):
+    def show_result(self) -> None:
+        self.results_screen.load_map(self.selected_map)
         self.state = GameState.result_screen
 
-    def show_main(self):
-        if self.sound:
-
-            self.music.stop()
-            self.music.unload()
-
-            self.music.load("assets/music/menu.mp3")
-            self.music.play(-1)
+    def show_main(self) -> None:
+        self.change_music("menu.mp3")
 
         self.state = GameState.main_menu
 
-    def ms_to_sec(self, ms):
+    def ms_to_sec(self, ms: float) -> str:
         ms = int(ms)
         seconds = ms // 1000
         ms = ms % 1000
         return f"{seconds}.{ms}"
 
-    def mainloop(self):
+    def mainloop(self) -> None:
         events = pygame.event.get()
 
         self.screen.fill((0, 0, 0))
@@ -188,50 +202,32 @@ class Game:
             self.main_menu.draw()
 
         elif self.state == GameState.race:
-            self.map.draw_background()
             self.map.barrier.update()
+            player = [car for car in self.cars if isinstance(car, PlayerCar)][0]
 
+            is_ctrl_pressed = pygame.key.get_mods() & pygame.KMOD_CTRL
             for event in events:
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_r:
-                        self.end_race()
+                    if is_ctrl_pressed:
+                        if event.key == pygame.K_F1:
+                            self.end_race()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     print(event.pos)
 
             self.update_cars()
 
-            self.map.draw_overlay()
-
-            if self.selected_map == 3:
-                self.snowfall.snowfall(self.screen, random.random() - 0.5)
-
-            self.time += 1000 / 60
-            text_surface = self.font.render(self.ms_to_sec(self.time), True, (255, 255, 255))
-            # self.screen.blit(text_surface, (self.screen.get_width() - 100 - text_surface.get_width(), 100))
-
-            player = filter(lambda x: isinstance(x, PlayerCar), self.cars).__iter__().__next__()
-
             if player.okrazenie < 3:
                 self.lap_times[player.okrazenie] += 1000 / 60
 
-            screen_width = self.screen.get_width()
+            if self.crate_cooldown <= 0:
+                self.map.add_crate()
+                self.crate_cooldown = 60 * 5
 
-            for i, time in enumerate(self.lap_times):
-                time_color = (123, 123, 123)
-                if (i == player.okrazenie):
-                    time_color = (255, 255, 255)
+            self.crate_cooldown -= 1
 
-                time_surface = self.font.render(self.ms_to_sec(time), True, time_color)    
-                time_width = time_surface.get_width()
+            self.draw_everything()
 
-                space_for_time_text = 150
-
-                self.screen.blit(time_surface, (screen_width / 2 - time_width / 2 + space_for_time_text * (i - 1), 25))
-
-            lap_surface = self.font.render(f"{player.okrazenie + 1}/3", True, (255, 255, 255))
-            self.screen.blit(lap_surface, (screen_width - lap_surface.get_width() - 25, 25))
-
-
+            self.time += 1000 / 60
             # self.draw_debug()
 
 
@@ -246,6 +242,10 @@ class Game:
         elif self.state == GameState.game_settings:
             self.game_settings.update(events)
             self.game_settings.draw()
+        
+        elif self.state == GameState.starting_countdown:
+            self.countdown_screen.update(events)
+            self.countdown_screen.draw()
 
         self.real_screen.blit(pygame.transform.scale(self.screen, self.real_screen.get_size()), (0, 0))
         pygame.display.flip()
@@ -253,12 +253,45 @@ class Game:
         # zamykanie gry
         for event in events:
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_q:
+                if event.key == pygame.K_ESCAPE:
                     self.running = False
             if event.type == pygame.QUIT:
                 self.running = False
 
-    def draw_debug(self):
+    def draw_everything(self) -> None:
+        self.map.draw_background()
+
+        for car in self.cars:
+            car.draw()
+
+        # rysowanie wszystkiego przed autami
+        self.map.draw_overlay()
+        if self.selected_map == 3:
+            self.snowfall.snowfall(self.screen, random.random() - 0.5)
+
+        # rysowanie statystyk gracza (power-up i pasek nitro)
+        player = [car for car in self.cars if isinstance(car, PlayerCar)][0]
+        player.draw_stats()
+
+        # rysowanie czasu
+        screen_width = self.screen.get_width()
+        for i, time in enumerate(self.lap_times):
+            time_color = (123, 123, 123)
+            if (i == player.okrazenie):
+                time_color = (255, 255, 255)
+
+            time_surface = self.font.render(self.ms_to_sec(time), True, time_color)    
+            time_width = time_surface.get_width()
+
+            space_for_time_text = 150
+
+            self.screen.blit(time_surface, (screen_width / 2 - time_width / 2 + space_for_time_text * (i - 1), 8))
+
+        # rysowanie liczby okrążeń
+        lap_surface = self.font.render(f"{player.okrazenie + 1}/3", True, (255, 255, 255))
+        self.screen.blit(lap_surface, (screen_width - lap_surface.get_width() - 25, 8))
+
+    def draw_debug(self) -> None:
         for car in self.cars:
             car.draw_debug()
         for i in self.map.progress_rectangles:
@@ -266,11 +299,15 @@ class Game:
         for d in self.map.waypoints:
             d.draw(self.screen)
 
-    def update_cars(self):
+    def update_cars(self) -> None:
+        "Funkcja aktualizuje auta i przetwarza kolizje między nimi"
+
+        # używamy tu techniki nazywanej w grach y-sorting
+        # auta które są niżej, a zarazem bliżej teoretycznej kamery
+        # są wyświetlane ostatnie żeby zakryć auta położone dalej
         self.cars.sort(key=lambda x: x.position.y)
         for car in self.cars:
             car.update()
-            car.draw()
 
             for obstacle in self.map.obstacles:
                 if car.spin <= 0 and obstacle.collides(car.position) and car.velocity.length() > 5:
@@ -286,20 +323,27 @@ class Game:
                     self.map.dissapearing_obstacles.remove(obstacle)
                     break
 
+            if self.map.crate and self.map.crate.check_hit(car):
+                self.map.crate = None
+                car.get_random_power_up()
+
             if self.map.progress_rectangles[car.track_progress].check_hit(car.position):
                 car.track_progress += 1
                 if car.track_progress == len(self.map.progress_rectangles):
                     car.okrazenie += 1
                     car.track_progress = 0
 
-                    # if isinstance(car, PlayerCar):
-                    #     self.lap_times.append(self.time - sum(self.lap_times))
-
                     if car.okrazenie == 3 and isinstance(car, PlayerCar):
                         self.end_race()
 
+                    if car.okrazenie == 3 and isinstance(car, EnemyCar):
+                        car.ghost_cooldown = int(1e10)
+                        car.speed = 0
+                        self.player_rank += 1
+                        car.reduce_speed(0.3)
 
         for car1, car2 in itertools.combinations(self.cars, 2):
+            if car1.is_ghost() or car2.is_ghost(): continue
             intersecting = False
             if (car1.position - car2.position).length() > 100:
                 # jezeli auta są daleko od siebie to nie sprawdzamy kolizji

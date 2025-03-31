@@ -1,3 +1,4 @@
+from __future__ import annotations
 import pygame
 from button import Button
 
@@ -6,7 +7,7 @@ class GameSettings:
     """
     Klasa odpowiedzialna za ekran z wyborem pojazdu oraz mapy  
     """
-    def __init__(self, game):
+    def __init__(self, game: Game) -> None:
 
         self.car_frame_index = 6
         self.last_frame_time = pygame.time.get_ticks()
@@ -62,9 +63,9 @@ class GameSettings:
         self.map_pick_rect = self.map_pick_text.get_rect(center=(960, 550))
 
 
-        self.map_1_btn = Button(pos=(380,875),text_var="Map Name", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
+        self.map_1_btn = Button(pos=(380,875),text_var="Countryside Circuit", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
         self.map_2_btn = Button(pos=(960,875),text_var="Petrol City", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
-        self.map_3_btn = Button(pos=(1540,875),text_var="Map Name", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
+        self.map_3_btn = Button(pos=(1540,875),text_var="Snowy Slipstream", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
 
         self.chosen_map = 1
 
@@ -76,7 +77,7 @@ class GameSettings:
                                   hover_color=(86,86,86),real_screen=self.game.real_screen)
 
 
-    def update(self, events):
+    def update(self, events: list[pygame.event.Event]) -> None:
 
         current_time = pygame.time.get_ticks()
         if current_time - self.last_frame_time > 200:  # 500ms = 0.5s
@@ -111,7 +112,7 @@ class GameSettings:
                     print("Wybrane auto:",self.chosen_car)
                     print("Wybrana mapa:",self.chosen_map)
                     self.game.selected_map = self.chosen_map - 1
-                    self.game.start_race(self.chosen_map, self.chosen_car)
+                    self.game.start_countdown(self.chosen_map, self.chosen_car)
 
                 # Zmiana wybranego auta po kliknięciu przycisku
                 for index, car_btn in enumerate(self.car_btns,start=1):
@@ -152,14 +153,14 @@ class GameSettings:
                         self.chosen_map = index
                 
 
-    def draw(self):
+    def draw(self) -> None:
         # Odpowiednie ustawienie wszystkich przycisków, obrazków oraz napisów na ekranie
 
-        self.play_button.update(self.game.screen)
+        self.play_button.draw(self.game.screen)
         for car_btn in self.car_btns:
-            car_btn.update(self.game.screen)
+            car_btn.draw(self.game.screen)
         for map_btn in self.map_btns:
-            map_btn.update(self.game.screen)
+            map_btn.draw(self.game.screen)
         for index, map_img in enumerate(self.map_imgs):
 
             map_rect = map_img.get_rect(center=(380+(index*580),725))

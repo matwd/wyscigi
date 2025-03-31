@@ -1,0 +1,4 @@
+Czcionka Jersey 10 jest na licencji OFL
+Jej licencję można też znaleźć na stronie https://fonts.google.com/specimen/Jersey+10/license
+Czcionka 8 Bit Wonder jest na własnej licencji która znajduje się w pliku README.TXT
+Jej licencję można też znaleźć na stronie https://www.dafont.com/8bit-wonder.font (jest w pliku zip po pobraniu czcionki)

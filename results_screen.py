@@ -130,7 +130,7 @@ class ResultsScreen:
         pygame.draw.rect(self.game.screen, (0, 0, 0), self.resultsBg)
 
         # wyświetlanie nazwy mapy
-        self.title_text = self.fontBig.render("green map" if self.game.selected_map == 1 else "Petrol City" if self.game.selected_map == 2 else "snow map", True, (255, 255, 255))
+        self.title_text = self.fontBig.render("Countryside Circuit" if self.game.selected_map == 1 else "Petrol City" if self.game.selected_map == 2 else "Snowy Slipstream", True, (255, 255, 255))
         self.game.screen.blit(self.title_text, (self.screen_width // 2 - self.title_text.get_width() // 2, self.screen_height // 4))
 
         self.prev_map_button.draw(self.game.screen)

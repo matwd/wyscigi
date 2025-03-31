@@ -26,4 +26,4 @@ class Ghost(PowerUp):
     sprite_path = "assets/ghost.png"
 
     def use(self) -> None:
-        self.car.ghost_cooldown = 180
+        self.car.ghost_cooldown = 300

@@ -163,6 +163,7 @@ class Game:
         Zaczyna wyścig przez zrestartowanie licznika czasu
         i ustawienie odpowiednigo stanu gry
         """
+        self.time = 0
         self.lap_times = [0, 0, 0]
         # gracz jest pierwszy
         # za każdego przeciwnika który przejechał linię mety ta liczba jest zwiększana

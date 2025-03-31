@@ -209,7 +209,7 @@ class PlayerCar(Car):
                 self.accelerate(3)
         # Zostawienie przeszkody na torze (jeżeli dostępna)
         # klawisze: Z
-        if keys[pygame.K_z]:
+        if keys[pygame.K_e]:
             if self.power_up:
                 self.power_up.use()
                 self.power_up = None

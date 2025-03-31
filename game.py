@@ -253,15 +253,17 @@ class Game:
         elif self.state == GameState.result_screen:
             self.results_screen.update(events)
             for event in events:
-                if event.key == pygame.K_ESCAPE:
-                    self.show_main()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.show_main()
             self.results_screen.draw()
 
         elif self.state == GameState.game_settings:
             self.game_settings.update(events)
             for event in events:
-                if event.key == pygame.K_ESCAPE:
-                    self.show_main()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.show_main()
             self.game_settings.draw()
         
         elif self.state == GameState.starting_countdown:

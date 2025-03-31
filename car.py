@@ -419,7 +419,7 @@ class EnemyCar4(EnemyCar2):
             else:
                 target = player.position + player.direction_vector.rotate(math.pi/4) * 80
                 self.turn_to_target(target)
-            pygame.draw.circle(self.game.screen, pygame.Color('red'), tuple(target), 3)
+            # pygame.draw.circle(self.game.screen, pygame.Color('red'), tuple(target), 3)
         # jeżeli daleko od gracza to jedź normalnie
         else:
             super().update()

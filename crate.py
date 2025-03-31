@@ -9,7 +9,7 @@ class Crate:
         self.position = position
         sprite_rectangle = sprites[0].get_rect()
         self.draw_position = position - Vector(sprite_rectangle.width, sprite_rectangle.height) / 2
-        self.hitbox = CircleHitbox(*self.position, 32)
+        self.hitbox = CircleHitbox(*self.position, 45)
         self.frame = 0
 
     def draw(self) -> None:

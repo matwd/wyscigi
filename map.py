@@ -85,11 +85,11 @@ class Map:
 
         self.music = map_data["music"]
 
-    def is_point_on_track(self, vec: Vector) -> bool:
+    def is_point_on_track(self, vec: Vector, is_ghost: bool=False) -> bool:
         rect = self.hitbox.get_rect()
 
         # sprawdź czy nie uderzono w szlaban
-        if self.barrier.check_hit(vec):
+        if self.barrier.check_hit(vec) and not is_ghost:
             return False
 
         # sprawdź czy punkt jest na mapie, jeżeli tak to sprawdź czy jest też na torze

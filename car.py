@@ -110,16 +110,20 @@ class Car:
         point4_outside = not self.map.is_point_on_track(points[3], is_ghost)
 
         if self.is_going_forward():
+            # jeżeli uderza w coś lewym rogiem z przodu to obraca się w prawo
             if point1_outside:
                 self.turn_right()
 
+            # jeżeli uderza w coś prawym rogiem z przodu to obraca się w lewo
             if point2_outside:
                 self.turn_left()
 
         else:
+            # jeżeli uderza w coś prawym rogiem z przodu to obraca się w prawo
             if point3_outside:
                 self.turn_right()
 
+            # jeżeli uderza w coś lewym rogiem z przodu to obraca się w lewo
             if point4_outside:
                 self.turn_left()
 
@@ -128,9 +132,11 @@ class Car:
         self.poslizg = ground_params[0]
         self.tarcie = ground_params[1]
 
+        # regeneracja nitro
         if self.nitro < 100:
-            self.nitro += 0.1
+            self.nitro += 0.2
 
+        # odliczanie cooldowna dla efektu ducha
         if self.ghost_cooldown > 0:
             self.ghost_cooldown -= 1
 
@@ -141,6 +147,7 @@ class Car:
         "Rysowanie samochodu"
         rect = self.sprites[0].get_rect()
         image_rect = pygame.Rect(self.x-rect.width/2, self.y-rect.width/2+random.randint(-1, 1), 256, 256)
+        # rysowanie samochodu
         if self.is_ghost():
             self.game.screen.blit(self.sprites[self.direction], image_rect, special_flags=pygame.BLEND_ADD)
         else:
@@ -190,8 +197,9 @@ class Car:
         self.game.map.dissapearing_obstacles.append(Obstacle(self.game, self.position - self.direction_vector.normalize() * 60, banana_texture))
 
     def get_random_power_up(self) -> None:
+        "Daje graczowi lub przeciwnikowi losowego power upa"
         if self.game.sound:
-                        pygame.mixer.Sound("assets/sfx/cratesfx.mp3").play()
+            pygame.mixer.Sound("assets/sfx/cratesfx.mp3").play()
         power_ups = [BananaPeel(self),Ghost(self)]
         random.shuffle(power_ups)
         self.power_up = power_ups[0]
@@ -319,9 +327,6 @@ class EnemyCar1(EnemyCar):
         target = self.waypoints[self.next_target]
         self.turn_to_target(target.position)
 
-    def draw(self):
-        super().draw()
-
 class EnemyCar2(EnemyCar):
     close_wall_check_cooldown = 0
 
@@ -349,6 +354,8 @@ class EnemyCar2(EnemyCar):
 
 
         # druga część logiki kierowania
+        # żeby ją lepiej zrozumieć polecam włączyć rysowanie informacji
+        # do debugowania (ctrl + F2)
 
         # wybieramy 5 kierunków (w lewo, troche w lewo, przed samochód, troche w prawo, w prawo)
         directions = [
@@ -359,6 +366,7 @@ class EnemyCar2(EnemyCar):
             self.ray_march(self.position, Vector(1, 0).rotate(d)) for d in directions
         ]
 
+        # obliczenie długości każdego z wysłanych promieni
         lidar = [(i - self.position).length() for i in lidar]
 
         # odliczenie odległości dla obydwu kierunków po lewej
@@ -397,8 +405,10 @@ class EnemyCar2(EnemyCar):
 
     def draw_debug(self) -> None:
         super().draw_debug()
-        # for p in lidar:
-            # pygame.draw.line(self.game.screen, (255, 0, 0), tuple(self.position), tuple(p))
+        directions = [(self.direction + off) / 16 * math.tau for off in range(-2, 3)]
+        lidar = [self.ray_march(self.position, Vector(1, 0).rotate(d)) for d in directions]
+        for p in lidar:
+            pygame.draw.line(self.game.screen, (255, 0, 0), tuple(self.position), tuple(p))
 
 
     def ray_march(self, start: Vector, direction: Vector) -> Vector:
@@ -421,6 +431,8 @@ class EnemyCar3(EnemyCar):
         player = [car for car in self.game.cars if isinstance(car, PlayerCar)][0]
         to_player_vector = player.position - self.position
         try_to_hit_player = False
+        # jeżeli jest za graczem lub ledwo co przed graczem to stara się potrącić gracza
+        # żeby go spowolnić. w przeciwnym wypadku jedzie normalnie
         if player.velocity.length() > 3:
             if to_player_vector.length() < 200 and self.direction_vector.scalar_product(player) > 0:
                 try_to_hit_player = True
@@ -435,10 +447,6 @@ class EnemyCar3(EnemyCar):
         self.turn_to_target(target)
 
         target = self.waypoints[self.next_target]
-
-
-    def draw(self) -> None:
-        super().draw()
 
 
 class EnemyCar4(EnemyCar2):
@@ -463,7 +471,3 @@ class EnemyCar4(EnemyCar2):
         # jeżeli daleko od gracza to jedź normalnie
         else:
             super().update()
-
-    def draw(self) -> None:
-        super().draw()
-        # super().draw_debug()

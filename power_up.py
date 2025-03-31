@@ -20,3 +20,10 @@ class BananaPeel(PowerUp):
 
     def use(self) -> None:
         self.car.leave_obstacle()
+
+
+class Ghost(PowerUp):
+    sprite_path = "assets/car-sprites/car-01/0001.png"
+
+    def use(self) -> None:
+        self.car.ghost_cooldown = 180

@@ -6,7 +6,7 @@ import random
 from hitbox import RectangleHitbox
 from obstacle import Obstacle
 import pygame.gfxdraw
-from power_up import BananaPeel
+from power_up import BananaPeel, Ghost
 
 class Car:
     "Klasa Samochodu z której dziedziczą klasy gracza i przeciwników"
@@ -173,7 +173,9 @@ class Car:
         self.game.map.dissapearing_obstacles.append(Obstacle(self.game, self.position - self.direction_vector.normalize() * 60, banana_texture))
 
     def get_random_power_up(self) -> None:
-        self.power_up = BananaPeel(self)
+        power_ups = [BananaPeel(self),Ghost(self)]
+        random.shuffle(power_ups)
+        self.power_up = power_ups[0]
 
 class PlayerCar(Car):
     "Klasa auta gracza"
@@ -208,7 +210,7 @@ class PlayerCar(Car):
                 self.nitro -= 5
                 self.accelerate(3)
         # Zostawienie przeszkody na torze (jeżeli dostępna)
-        # klawisze: Z
+        # klawisze: E
         if keys[pygame.K_e]:
             if self.power_up:
                 self.power_up.use()

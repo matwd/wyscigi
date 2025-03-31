@@ -1,6 +1,6 @@
 # Petrol Pandemonium
 
-Zadanie do 2 etapu konkursu motorola science cup stworzone przez naszą drużynę "**Błędy z Kwerendy**"
+Zadanie do 1 etapu konkursu motorola science cup stworzone przez naszą drużynę "**Błędy z Kwerendy**"
 
 ## Jak uruchomić grę?
 

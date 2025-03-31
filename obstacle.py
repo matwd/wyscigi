@@ -19,7 +19,6 @@ class Obstacle:
 
     def draw(self) -> None:
         "Rysowanie przeszkody"
-        self.hitbox.draw(self.game.screen)
         self.game.screen.blit(self.sprite, tuple(self.draw_position))
 
     def draw_debug(self) -> None:

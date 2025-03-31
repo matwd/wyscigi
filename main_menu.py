@@ -29,7 +29,7 @@ class MainMenu:
                 if self.leaderboard_button.checkForInput(mouse_pos):
                     self.game.show_result()
 
-                if self.close_button_button.checkForInput(mouse_pos):
+                if self.close_button.checkForInput(mouse_pos):
                     self.game.running = False
 
 

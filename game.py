@@ -252,10 +252,16 @@ class Game:
 
         elif self.state == GameState.result_screen:
             self.results_screen.update(events)
+            for event in events:
+                if event.key == pygame.K_ESCAPE:
+                    self.show_main()
             self.results_screen.draw()
 
         elif self.state == GameState.game_settings:
             self.game_settings.update(events)
+            for event in events:
+                if event.key == pygame.K_ESCAPE:
+                    self.show_main()
             self.game_settings.draw()
         
         elif self.state == GameState.starting_countdown:
@@ -270,8 +276,6 @@ class Game:
             if event.type == pygame.KEYDOWN:
                 flags = self.real_screen.get_flags()
                 is_fullscreen = bool(flags & pygame.FULLSCREEN) 
-                if event.key == pygame.K_ESCAPE:
-                    self.running = False
                 if event.key == pygame.K_F11 and not is_fullscreen:
                     self.real_screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
                 elif event.key == pygame.K_F11 and is_fullscreen:

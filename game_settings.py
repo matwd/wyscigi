@@ -63,9 +63,9 @@ class GameSettings:
         self.map_pick_rect = self.map_pick_text.get_rect(center=(960, 550))
 
 
-        self.map_1_btn = Button(pos=(380,875),text_var="Map Name", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
+        self.map_1_btn = Button(pos=(380,875),text_var="Countryside Circuit", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
         self.map_2_btn = Button(pos=(960,875),text_var="Petrol City", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
-        self.map_3_btn = Button(pos=(1540,875),text_var="Map Name", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
+        self.map_3_btn = Button(pos=(1540,875),text_var="Snowy Slipstream", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
 
         self.chosen_map = 1
 

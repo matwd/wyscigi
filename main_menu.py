@@ -24,9 +24,13 @@ class MainMenu:
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.play_button.checkForInput(mouse_pos):
+                    if self.game.sound:
+                        pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
                     self.game.open_settings()
 
                 if self.leaderboard_button.checkForInput(mouse_pos):
+                    if self.game.sound:
+                        pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
                     self.game.show_result()
 
                 if self.close_button.checkForInput(mouse_pos):

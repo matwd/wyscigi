@@ -109,6 +109,8 @@ class GameSettings:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # Rozpoczęcie gry wraz z wybranymi ustawieniami po kliknięciu przycisku 
                 if self.play_button.checkForInput(mouse_pos):
+                    if self.game.sound:
+                        pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
                     print("Wybrane auto:",self.chosen_car)
                     print("Wybrana mapa:",self.chosen_map)
                     self.game.selected_map = self.chosen_map - 1
@@ -118,6 +120,8 @@ class GameSettings:
                 for index, car_btn in enumerate(self.car_btns,start=1):
                     if car_btn.checkForInput(mouse_pos):
                         if self.chosen_car!=index:
+                            if self.game.sound:
+                                pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
                             self.chosen_car=index
                             self.car_frame_index = 6
                             self.last_frame_time = pygame.time.get_ticks()
@@ -132,6 +136,8 @@ class GameSettings:
                     if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top,rect.bottom):
                         # Jeśli tak, robimy to samo co w przypadku kliknięcia przycisku
                         if self.chosen_car != index:
+                            if self.game.sound:
+                                pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
                             self.chosen_car = index
                             self.car_frame_index = 6
                             self.last_frame_time = pygame.time.get_ticks()
@@ -139,7 +145,10 @@ class GameSettings:
                 # Zmiana wybranej mapy po kliknięciu przycisku
                 for index, map_btn in enumerate(self.map_btns,start=1):
                     if map_btn.checkForInput(mouse_pos):
-                        self.chosen_map=index
+                        if self.chosen_map != index:
+                            if self.game.sound:
+                                    pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
+                            self.chosen_map=index
 
                 # Zmiana wybranej mapy po kliknięciu na obrazek
 
@@ -150,7 +159,10 @@ class GameSettings:
                                 round(mouse_pos[1] / self.game.real_screen.get_size()[1] * 1080)]
                     if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top,rect.bottom):
                         # Jeśli tak, robimy to samo co w przypadku kliknięcia przycisku
-                        self.chosen_map = index
+                        if self.chosen_map != index:
+                            if self.game.sound:
+                                pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
+                            self.chosen_map = index
                 
 
     def draw(self) -> None:

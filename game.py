@@ -101,6 +101,8 @@ class Game:
         self.music = pygame.mixer.music
         self.last_music = ""
 
+        self.debug_mode = False
+
         self.show_main()
         # self.start_countdown(1, 1)
 
@@ -226,10 +228,17 @@ class Game:
                     if is_ctrl_pressed:
                         if event.key == pygame.K_F1:
                             self.end_race()
+                        if event.key == pygame.K_F2:
+                            if self.debug_mode:
+                                self.debug_mode = False
+                            else:
+                                self.debug_mode = True
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     print(event.pos)
 
             self.update_cars()
+
+            
 
             if player.okrazenie < 3:
                 self.lap_times[player.okrazenie] += 1000 / 60
@@ -243,6 +252,9 @@ class Game:
             self.draw_everything()
 
             self.time += 1000 / 60
+
+            if self.debug_mode:
+                self.draw_debug()
             # self.draw_debug()
 
 

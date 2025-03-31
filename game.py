@@ -150,6 +150,12 @@ class Game:
         self.state = GameState.game_settings
 
     def start_countdown(self, map: Map, chosen_car: int) -> None:
+        """
+        Zaczyna odliczanie czasu do rozpoczęcia wyścigu przez ustawienie odpowiedniego stanu gry,
+        ładuje auta oraz mapę i restartuje licznik czasu
+        """
+        self.time = 0
+        self.lap_times = [0, 0, 0]
         self.state = GameState.starting_countdown
         self.selected_map = map
         self.map.load_from_directory(f"assets/maps/map-{map:02}", map)
@@ -160,11 +166,9 @@ class Game:
 
     def start_race(self) -> None:
         """
-        Zaczyna wyścig przez zrestartowanie licznika czasu
-        i ustawienie odpowiednigo stanu gry
+        Zaczyna wyścig przez ustawienie odpowiednigo stanu gry
         """
-        self.time = 0
-        self.lap_times = [0, 0, 0]
+        
         # gracz jest pierwszy
         # za każdego przeciwnika który przejechał linię mety ta liczba jest zwiększana
         self.player_rank = 1

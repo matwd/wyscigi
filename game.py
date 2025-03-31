@@ -101,6 +101,8 @@ class Game:
         self.music = pygame.mixer.music
         self.last_music = ""
 
+        self.debug_mode = False
+
         self.show_main()
         # self.start_countdown(1, 1)
 
@@ -226,10 +228,17 @@ class Game:
                     if is_ctrl_pressed:
                         if event.key == pygame.K_F1:
                             self.end_race()
+                        if event.key == pygame.K_F2:
+                            if self.debug_mode:
+                                self.debug_mode = False
+                            else:
+                                self.debug_mode = True
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     print(event.pos)
 
             self.update_cars()
+
+            
 
             if player.okrazenie < 3:
                 self.lap_times[player.okrazenie] += 1000 / 60
@@ -243,6 +252,9 @@ class Game:
             self.draw_everything()
 
             self.time += 1000 / 60
+
+            if self.debug_mode:
+                self.draw_debug()
             # self.draw_debug()
 
 
@@ -252,10 +264,18 @@ class Game:
 
         elif self.state == GameState.result_screen:
             self.results_screen.update(events)
+            for event in events:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.show_main()
             self.results_screen.draw()
 
         elif self.state == GameState.game_settings:
             self.game_settings.update(events)
+            for event in events:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.show_main()
             self.game_settings.draw()
         
         elif self.state == GameState.starting_countdown:
@@ -270,8 +290,6 @@ class Game:
             if event.type == pygame.KEYDOWN:
                 flags = self.real_screen.get_flags()
                 is_fullscreen = bool(flags & pygame.FULLSCREEN) 
-                if event.key == pygame.K_ESCAPE:
-                    self.running = False
                 if event.key == pygame.K_F11 and not is_fullscreen:
                     self.real_screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
                 elif event.key == pygame.K_F11 and is_fullscreen:

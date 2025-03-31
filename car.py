@@ -27,6 +27,9 @@ class Car:
         self.power_up = None
         self.ghost_cooldown = 0
 
+    # getter i setter dla kierunku
+    # tak jak w grach retro samochód może być oburcony w ograniczoną ilość kierunków
+    # u nas jest to 16 kierunków
     @property
     def direction(self) -> int:
         return self._direction
@@ -40,6 +43,7 @@ class Car:
         self.direction_vector = Vector(math.cos(degree_in_radians), math.sin(degree_in_radians))
         self.recalculate_hitbox()
 
+    # poniżej są gettery i settery dla współrzędnych x i y
     @property
     def x(self) -> int:
         return self.position.x
@@ -59,18 +63,29 @@ class Car:
         self.recalculate_hitbox()
 
     def is_ghost(self) -> bool:
+        "Sprawdza czy samochód obecnie jest duchem"
         return self.ghost_cooldown > 0
 
     def is_going_forward(self) -> bool:
+        """
+        Sprawdza czy samochód porusza się do przodu
+        Korzystamy tu z matematycznych właściwości iloczynu wektorowego
+        Jeżeli kąt między dwoma wektorami jest mniejszy niż 90 stopni
+        to iloczyn wektorowy jest większy niż 0
+        """
         return self.direction_vector.scalar_product(self.velocity) > 0
 
     def update(self) -> None:
+        "Aktualizacja fizyki samochodu w każdej klatce"
+        # zwolnienie w zależności od tarcia
         self.reduce_speed(self.tarcie)
 
+        # przesuwamy samochód w zależności od jego prędkości
         old_position = self.position
         self.position += self.velocity
         self.recalculate_hitbox()
 
+        # jeżeli samochód jest w trakcie obrotu z powodu kałuży to się obraca
         if self.spin > 0:
             if self.spin % 2 == 0:
                 self.direction += 1
@@ -79,18 +94,17 @@ class Car:
 
         points = self.hitbox.get_points()
 
+        is_ghost = self.ghost_cooldown > 0
         for p in points:
-            if not self.map.is_point_on_track(p):
+            if not self.map.is_point_on_track(p, is_ghost):
                 self.velocity += (self.position - p).normalize() * 0.2
-                # self.position += old_position
-                # self.position /= 2
                 self.position += (self.position - p) * 0.05
                 self.velocity *= 0.91
 
-        point1_outside = not self.map.is_point_on_track(points[0])
-        point2_outside = not self.map.is_point_on_track(points[1])
-        point3_outside = not self.map.is_point_on_track(points[2])
-        point4_outside = not self.map.is_point_on_track(points[3])
+        point1_outside = not self.map.is_point_on_track(points[0], is_ghost)
+        point2_outside = not self.map.is_point_on_track(points[1], is_ghost)
+        point3_outside = not self.map.is_point_on_track(points[2], is_ghost)
+        point4_outside = not self.map.is_point_on_track(points[3], is_ghost)
 
         if self.is_going_forward():
             if point1_outside:

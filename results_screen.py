@@ -115,14 +115,24 @@ class ResultsScreen:
                     self.game.show_main()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.close_button.checkForInput(mouse_pos):
+                    if self.game.sound:
+                        pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
                     self.game.show_main()
                 if self.next_map_button.checkForInput(mouse_pos):
+                    if self.game.sound:
+                        pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
                     self.next_map()
                 if self.prev_map_button.checkForInput(mouse_pos):
+                    if self.game.sound:
+                        pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
                     self.prev_map()
                 if self.next_page_button.checkForInput(mouse_pos):
+                    if self.game.sound:
+                        pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
                     self.next_page()
                 if self.prev_page_button.checkForInput(mouse_pos):
+                    if self.game.sound:
+                        pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
                     self.prev_page()
 
     def draw(self) -> None:

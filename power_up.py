@@ -26,4 +26,6 @@ class Ghost(PowerUp):
     sprite_path = "assets/ghost.png"
 
     def use(self) -> None:
+        if self.car.game.sound:
+            pygame.mixer.Sound("assets/sfx/ghostsfx.mp3").play()
         self.car.ghost_cooldown = 300

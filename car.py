@@ -27,6 +27,9 @@ class Car:
         self.power_up = None
         self.ghost_cooldown = 0
 
+        self.drift = pygame.mixer.Sound("assets/sfx/drift.mp3")
+        self.drift2 = pygame.mixer.Sound("assets/sfx/drift.mp3")
+
     # getter i setter dla kierunku
     # tak jak w grach retro samochód może być oburcony w ograniczoną ilość kierunków
     # u nas jest to 16 kierunków
@@ -187,6 +190,8 @@ class Car:
         self.game.map.dissapearing_obstacles.append(Obstacle(self.game, self.position - self.direction_vector.normalize() * 60, banana_texture))
 
     def get_random_power_up(self) -> None:
+        if self.game.sound:
+                        pygame.mixer.Sound("assets/sfx/cratesfx.mp3").play()
         power_ups = [BananaPeel(self),Ghost(self)]
         random.shuffle(power_ups)
         self.power_up = power_ups[0]
@@ -205,10 +210,22 @@ class PlayerCar(Car):
         # klawisze: strzałka w lewo lub A
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             self.turn_left()
+
+            if self.velocity.length() > 12 and self.game.sound:
+                self.drift.play()
+        else:
+            if self.game.sound:
+                self.drift.fadeout(300)
         # skręcanie w prawo
         # klawisze: strzałka w prawo lub D
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.turn_right()
+
+            if self.velocity.length() > 12 and self.game.sound:
+                self.drift2.play()
+        else:
+            if self.game.sound:
+                self.drift2.fadeout(300)
         # jazda do przodu
         # klawisze: strzałka do przodu lub W
         if keys[pygame.K_UP] or keys[pygame.K_w]:

@@ -255,12 +255,19 @@ class EnemyCar(Car):
         super().update()
         # jeżeli gracz przejedzie przez jakikolwiek waypoint
         # to ustawia kolejny waypoint na swój cel
+        # jest to mniej optymalne od śledzenia tylko pojedyńczych waypointów
+        # ale jest to potrzebne, żeby drugi i czwarty przeciwnik mogli jeździć
+        # na skróty
         for i, w in enumerate(self.waypoints):
             if w.check_hit(self.position):
                 self.next_target = (i + 1) % len(self.waypoints)
         # target = self.waypoints[self.next_target]
         # if target.check_hit(self.position):
         #     self.next_target = (self.next_target + 1) % len(self.waypoints)
+        if self.power_up:
+            if random.randint(0, 60*5) == 0:
+                self.power_up.use()
+                self.power_up = None
 
     def turn_to_target(self, target: Vector) -> None:
         "Obróć się do celu i jedź do niego"

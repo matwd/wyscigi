@@ -26,6 +26,8 @@ class Button():
         elif cords == Cords.topright:
             self.rect = self.text.get_rect(topright=(self.x,self.y))
 
+        self.rect.top = self.rect.top + (self.rect.bottom - self.rect.top) / 2
+        self.rect.bottom = self.rect.bottom - (self.rect.bottom - self.rect.top) / 2
 
     def draw(self, screen: pygame.surface.Surface) -> None:
         # pygame.draw.rect(screen, (255, 0, 0), self.rect)
@@ -36,7 +38,7 @@ class Button():
         Obsługa naciśnięcia przycisku.
         """
         position = [round(position[0]/self.real_screen.get_size()[0] * 1920), round(position[1] / self.real_screen.get_size()[1] * 1080)]
-        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
+        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(int(self.rect.top + (self.rect.bottom - self.rect.top) / 4), int(self.rect.bottom- (self.rect.bottom - self.rect.top) / 4)):
             return True
         return False
     
@@ -45,7 +47,7 @@ class Button():
         Obsługa zmiany koloru przycisku po najechaniu
         """
         position = [round(position[0]/self.real_screen.get_size()[0] * 1920), round(position[1] / self.real_screen.get_size()[1] * 1080)]
-        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom) and not hide:
+        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(int(self.rect.top + (self.rect.bottom - self.rect.top) / 4), int(self.rect.bottom- (self.rect.bottom - self.rect.top) / 4)) and not hide:
             # jeżeli najechano na przycisk i nie jest on ukryty, to zmienia kolor na hover_color sprecyzowany w konstruktorze
             self.text = self.font.render(self.text_var, True, self.hover_color)
         elif hide:

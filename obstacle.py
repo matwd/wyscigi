@@ -11,12 +11,16 @@ class Obstacle:
     def __init__(self, game: Game, position: Vector, sprite: pygame.surface.Surface) -> None:
         self.game = game
         self.position = position
-        self.hitbox = RectangleHitbox(*tuple(position), 0, 100, 60)
+        # hitbox przeszkody jest oparty na jej sprite
+        sprite_rect = sprite.get_rect()
+        self.draw_position = position - Vector(sprite_rect.width, sprite_rect.height) / 2
+        self.hitbox = RectangleHitbox(*tuple(position), 0, sprite_rect.width, sprite_rect.height)
         self.sprite = sprite
 
     def draw(self) -> None:
         "Rysowanie przeszkody"
-        self.game.screen.blit(self.sprite, (*tuple(self.position - Vector(64, 44)), 128, 128))
+        self.hitbox.draw(self.game.screen)
+        self.game.screen.blit(self.sprite, tuple(self.draw_position))
 
     def draw_debug(self) -> None:
         "Rysowanie hitbox przeszkody"

@@ -172,6 +172,9 @@ class Game:
 
         self.change_music(self.map.music)
 
+        if self.sound:
+            pygame.mixer.Sound("assets/sfx/racestartsfx.mp3").play()
+        
         self.init_cars(chosen_car-1)
 
     def start_race(self) -> None:
@@ -330,12 +333,18 @@ class Game:
                 if car.spin <= 0 and obstacle.collides(car.position) and car.velocity.length() > 5:
                     car.spin = 16*2
                     if self.sound:
-                        pygame.mixer.Sound("assets/sfx/poslizg.mp3").play()
+                        slip = pygame.mixer.Sound("assets/sfx/poslizg.mp3")
+                        slip.set_volume(0.5)
+                        slip.play()
                     car.reduce_speed(0.1)
 
             for obstacle in self.map.dissapearing_obstacles:
                 if car.spin <= 0 and obstacle.collides(car.position) and car.velocity.length() > 5:
                     car.spin = 16*2
+                    if self.sound:
+                        slip = pygame.mixer.Sound("assets/sfx/poslizg.mp3")
+                        slip.set_volume(0.5)
+                        slip.play()
                     car.reduce_speed(0.1)
                     self.map.dissapearing_obstacles.remove(obstacle)
                     break

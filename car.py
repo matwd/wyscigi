@@ -173,6 +173,8 @@ class Car:
         self.game.map.dissapearing_obstacles.append(Obstacle(self.game, self.position - self.direction_vector.normalize() * 60, banana_texture))
 
     def get_random_power_up(self) -> None:
+        if self.game.sound:
+                        pygame.mixer.Sound("assets/sfx/cratesfx.mp3").play()
         power_ups = [BananaPeel(self),Ghost(self)]
         random.shuffle(power_ups)
         self.power_up = power_ups[0]

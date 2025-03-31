@@ -352,30 +352,36 @@ class Game:
         for car in self.cars:
             car.update()
 
-            for obstacle in self.map.obstacles:
-                if car.spin <= 0 and obstacle.collides(car.position) and car.velocity.length() > 5:
-                    car.spin = 16*2
-                    if self.sound:
-                        slip = pygame.mixer.Sound("assets/sfx/poslizg.mp3")
-                        slip.set_volume(0.5)
-                        slip.play()
-                    car.reduce_speed(0.1)
+            # jeżeli gracz nie jest duchem to wchodzi w kolicje z przeszkodami
+            if not car.is_ghost():
+                # kolizja z plamami oleju
+                for obstacle in self.map.obstacles:
+                    if car.spin <= 0 and obstacle.collides(car.position) and car.velocity.length() > 5:
+                        car.spin = 16*2
+                        if self.sound:
+                            slip = pygame.mixer.Sound("assets/sfx/poslizg.mp3")
+                            slip.set_volume(0.5)
+                            slip.play()
+                        car.reduce_speed(0.1)
 
-            for obstacle in self.map.dissapearing_obstacles:
-                if car.spin <= 0 and obstacle.collides(car.position) and car.velocity.length() > 5:
-                    car.spin = 16*2
-                    if self.sound:
-                        slip = pygame.mixer.Sound("assets/sfx/poslizg.mp3")
-                        slip.set_volume(0.5)
-                        slip.play()
-                    car.reduce_speed(0.1)
-                    self.map.dissapearing_obstacles.remove(obstacle)
-                    break
+                # kolizja z skórkami banana
+                for obstacle in self.map.dissapearing_obstacles:
+                    if car.spin <= 0 and obstacle.collides(car.position) and car.velocity.length() > 5:
+                        car.spin = 16*2
+                        if self.sound:
+                            slip = pygame.mixer.Sound("assets/sfx/poslizg.mp3")
+                            slip.set_volume(0.5)
+                            slip.play()
+                        car.reduce_speed(0.1)
+                        self.map.dissapearing_obstacles.remove(obstacle)
+                        break
 
+            # zebranie skrzynki z power-upem
             if self.map.crate and self.map.crate.check_hit(car):
                 self.map.crate = None
                 car.get_random_power_up()
 
+            # obliczanie postępu jazdy wokół toru
             if self.map.progress_rectangles[car.track_progress].check_hit(car.position):
                 car.track_progress += 1
                 if car.track_progress == len(self.map.progress_rectangles):
@@ -391,8 +397,11 @@ class Game:
                         self.player_rank += 1
                         car.reduce_speed(0.3)
 
+        # kolizje między każdymi dwoma samochodami
         for car1, car2 in itertools.combinations(self.cars, 2):
             if car1.is_ghost() or car2.is_ghost(): continue
+
+            # sprawdzanie czy występuje kolizja
             intersecting = False
             if (car1.position - car2.position).length() > 100:
                 # jezeli auta są daleko od siebie to nie sprawdzamy kolizji
@@ -405,6 +414,8 @@ class Game:
             for point in car1_points:
                 if car2.hitbox.check_hit(point):
                     intersecting = True
+
+            # jeżeli wystąpiła kolizja to odpycha od siebie samochody
             if intersecting:
                 diff = car1.position - car2.position
                 car1.position += diff * 0.05

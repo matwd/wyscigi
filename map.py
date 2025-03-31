@@ -52,6 +52,7 @@ class Map:
         # czyszczenie tablic
         self.waypoints = []
         self.obstacles = []
+        self.crates = []
         self.progress_rectangles = []
         self.dissapearing_obstacles = []
         self.starting_points = []
@@ -71,6 +72,8 @@ class Map:
         for obstacle_cords in map_data["obstacles"][:2+level]:
             self.obstacles.append(Obstacle(self, Vector(*obstacle_cords), obstacle_texture))
 
+        for crate_cords in map_data["crates"]:
+            self.crates.append(Vector(*crate_cords))
         # Ładowanie szlabanu
         self.barrier = Barrier(*map_data["barrier"])
 
@@ -144,4 +147,5 @@ class Map:
     def add_crate(self) -> None:
         crate_sprites = [pygame.image.load(f"assets/crate/crate{i:>04}.png") for i in range(1, 17)]
         if not self.crate:
-            self.crate = Crate(self.screen, crate_sprites, Vector(1000, 200))
+            random.shuffle(self.crates)
+            self.crate = Crate(self.screen, crate_sprites, self.crates[0])

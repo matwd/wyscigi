@@ -1,3 +1,4 @@
+from __future__ import annotations
 import pygame
 
 class Cords():
@@ -9,7 +10,8 @@ class Button():
     """
     Klasa przycisku. Obsługuje najechanie oraz naciśnięcie przycisku
     """
-    def __init__(self, pos: tuple[int, int], text_var: str, font: pygame.font.Font, text_color: pygame.color.Color, hover_color: pygame.color.Color, real_screen: pygame.surface.Surface, cords: Cords=Cords.center) -> None:
+    def __init__(self, game: Game, pos: tuple[int, int], text_var: str, font: pygame.font.Font, text_color: pygame.color.Color, hover_color: pygame.color.Color, real_screen: pygame.surface.Surface, cords: Cords=Cords.center) -> None:
+        self.game = game
         self.x = pos[0]
         self.y = pos[1]
         self.font = font
@@ -40,6 +42,8 @@ class Button():
         """
         position = [round(position[0]/self.real_screen.get_size()[0] * 1920), round(position[1] / self.real_screen.get_size()[1] * 1080)]
         if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(int(self.rect.top + (self.rect.bottom - self.rect.top) / 4), int(self.rect.bottom- (self.rect.bottom - self.rect.top) / 5)) and not self.hide:
+            if self.game.sound:
+                pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
             return True
         return False
     

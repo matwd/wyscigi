@@ -1,6 +1,4 @@
 import pygame
-from button import Button
-from car import PlayerCar
 
 class CountdownScreen:
     """

@@ -20,13 +20,13 @@ class ResultsScreen:
 
         self.title_text = self.fontBig.render("Petrol City", True, (255, 255, 255))
 
-        self.prev_page_button = Button((self.screen_width // 4 + 20, self.screen_height // 4 + 50 * self.results_per_page + 10 + self.title_text.get_height()), "PREVIOUS PAGE", self.font, (255, 255, 255), (86, 86, 86), self.game.real_screen, Cords.topleft)
-        self.next_page_button = Button((self.screen_width // 4 + self.resultsBg.width - 20, self.screen_height // 4 + 50 * self.results_per_page + 10 + self.title_text.get_height()), "NEXT PAGE", self.font, (255, 255, 255), (86, 86, 86), self.game.real_screen, Cords.topright)
+        self.prev_page_button = Button(self.game, (self.screen_width // 4 + 20, self.screen_height // 4 + 50 * self.results_per_page + 10 + self.title_text.get_height()), "PREVIOUS PAGE", self.font, (255, 255, 255), (86, 86, 86), self.game.real_screen, Cords.topleft)
+        self.next_page_button = Button(self.game, (self.screen_width // 4 + self.resultsBg.width - 20, self.screen_height // 4 + 50 * self.results_per_page + 10 + self.title_text.get_height()), "NEXT PAGE", self.font, (255, 255, 255), (86, 86, 86), self.game.real_screen, Cords.topright)
 
-        self.prev_map_button = Button((self.screen_width // 4 + 20, self.screen_height // 4), "<", self.fontBig, (255, 255, 255), (86, 86, 86), self.game.real_screen, Cords.topleft)
-        self.next_map_button = Button((self.screen_width // 4 + self.resultsBg.width - 20, self.screen_height // 4), ">", self.fontBig, (255, 255, 255), (86, 86, 86), self.game.real_screen, Cords.topright)
+        self.prev_map_button = Button(self.game, (self.screen_width // 4 + 20, self.screen_height // 4), "<", self.fontBig, (255, 255, 255), (86, 86, 86), self.game.real_screen, Cords.topleft)
+        self.next_map_button = Button(self.game, (self.screen_width // 4 + self.resultsBg.width - 20, self.screen_height // 4), ">", self.fontBig, (255, 255, 255), (86, 86, 86), self.game.real_screen, Cords.topright)
 
-        self.close_button = Button((self.screen_width // 4 + 10, self.screen_height // 4), "X", self.font, (255, 255, 255), (255, 0, 0), self.game.real_screen, Cords.topleft)
+        self.close_button = Button(self.game, (self.screen_width // 4 + 10, self.screen_height // 4), "X", self.font, (255, 255, 255), (255, 0, 0), self.game.real_screen, Cords.topleft)
         self.selected_map = 1
         self.ranking = []
         self.load_map(1)
@@ -115,24 +115,14 @@ class ResultsScreen:
                     self.game.show_main()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.close_button.checkForInput(mouse_pos):
-                    if self.game.sound:
-                        pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
                     self.game.show_main()
                 if self.next_map_button.checkForInput(mouse_pos):
-                    if self.game.sound:
-                        pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
                     self.next_map()
                 if self.prev_map_button.checkForInput(mouse_pos):
-                    if self.game.sound:
-                        pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
                     self.prev_map()
                 if self.next_page_button.checkForInput(mouse_pos):
-                    if self.game.sound:
-                        pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
                     self.next_page()
                 if self.prev_page_button.checkForInput(mouse_pos):
-                    if self.game.sound:
-                        pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
                     self.prev_page()
 
     def draw(self) -> None:

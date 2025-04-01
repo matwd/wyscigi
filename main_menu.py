@@ -12,9 +12,9 @@ class MainMenu:
         self.bg = pygame.image.load("assets/menu/mainmenu1920x1080.png").convert()
 
         self.bg = pygame.transform.scale(self.bg,[1920,1080])
-        self.play_button = Button(pos=(1575, 770), text_var="PLAY", font=self.font, text_color=(255, 255, 255),hover_color=(86, 86, 86),real_screen=self.game.real_screen)
-        self.leaderboard_button = Button(pos=(1575, 885), text_var="LEADERBOARD", font=self.font, text_color=(255, 255, 255),hover_color=(86, 86, 86),real_screen=self.game.real_screen)
-        self.close_button = Button(pos=(1575, 1000), text_var="QUIT", font=self.font, text_color=(255, 255, 255),hover_color=(86, 86, 86),real_screen=self.game.real_screen)
+        self.play_button = Button(self.game, pos=(1575, 770), text_var="PLAY", font=self.font, text_color=(255, 255, 255),hover_color=(86, 86, 86),real_screen=self.game.real_screen)
+        self.leaderboard_button = Button(self.game, pos=(1575, 885), text_var="LEADERBOARD", font=self.font, text_color=(255, 255, 255),hover_color=(86, 86, 86),real_screen=self.game.real_screen)
+        self.close_button = Button(self.game, pos=(1575, 1000), text_var="QUIT", font=self.font, text_color=(255, 255, 255),hover_color=(86, 86, 86),real_screen=self.game.real_screen)
 
     def update(self, events: list[pygame.event.Event]) -> None:
         mouse_pos = pygame.mouse.get_pos()
@@ -24,13 +24,9 @@ class MainMenu:
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.play_button.checkForInput(mouse_pos):
-                    if self.game.sound:
-                        pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
                     self.game.open_settings()
 
                 if self.leaderboard_button.checkForInput(mouse_pos):
-                    if self.game.sound:
-                        pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
                     self.game.show_result()
 
                 if self.close_button.checkForInput(mouse_pos):

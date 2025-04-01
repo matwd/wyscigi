@@ -365,6 +365,7 @@ class EnemyCar2(EnemyCar):
             return
 
 
+        # jeżeli samochód jest skierowany w mniej więcej dobrym kierunku:
         # druga część logiki kierowania
         # żeby ją lepiej zrozumieć polecam włączyć rysowanie informacji
         # do debugowania (ctrl + F2)

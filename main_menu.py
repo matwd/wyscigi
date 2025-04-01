@@ -1,6 +1,6 @@
 from __future__ import annotations
 import pygame
-from button import Button
+from button import Button, Cords
 
 class MainMenu:
     """
@@ -9,6 +9,7 @@ class MainMenu:
     def __init__(self, game: Game) -> None:
         self.game = game
         self.font = pygame.font.Font("assets/font/Jersey10.ttf", 140)
+        self.iconFont = pygame.font.Font("assets/font/soundicon.ttf", 100)
         self.bg = pygame.image.load("assets/menu/mainmenu1920x1080.png").convert()
         self.bg = pygame.transform.scale(self.bg,[1920,1080])
 
@@ -18,6 +19,10 @@ class MainMenu:
         self.leaderboard_button = Button(self.game, pos=(1575, 885), text_var="LEADERBOARD", font=self.font, text_color=(255, 255, 255),hover_color=(86, 86, 86),real_screen=self.game.real_screen)
         self.close_button = Button(self.game, pos=(1575, 1000), text_var="QUIT", font=self.font, text_color=(255, 255, 255),hover_color=(86, 86, 86),real_screen=self.game.real_screen)
 
+        # Przycisk do wyciszenia dźwięku
+        # Stworzyliśmy do niego specjalną czcionkę, która zawiera ikonki głośnika, 'B' - dzięk włączony, 'C' - dźwięk wyłączony
+        self.mute_button = Button(self.game, pos=(20, 0), text_var="B", font=self.iconFont, text_color=(255, 255, 255),hover_color=(86, 86, 86),real_screen=self.game.real_screen, cords=Cords.topleft)
+
     def update(self, events: list[pygame.event.Event]) -> None:
 
         # Obsługa najechania na przyciski
@@ -26,6 +31,11 @@ class MainMenu:
         self.play_button.changeColor(mouse_pos)
         self.leaderboard_button.changeColor(mouse_pos)
         self.close_button.changeColor(mouse_pos)
+
+        if self.game.speakers:
+            self.mute_button.changeColor(mouse_pos)
+            self.mute_button.text_var = "B" if self.game.sound else "C"
+
         for event in events:
 
             # Obsługa naciśnięcia na przyciski
@@ -40,6 +50,14 @@ class MainMenu:
                 if self.close_button.checkForInput(mouse_pos):
                     self.game.running = False
 
+                if self.mute_button.checkForInput(mouse_pos) and self.game.speakers:
+                    if self.game.sound:
+                        self.game.sound = False
+                        self.game.music.set_volume(0)
+                    else:
+                        self.game.sound = True
+                        self.game.music.set_volume(1)
+
 
     def draw(self) -> None:
         # Rysowanie wszystkiego na ekranie
@@ -47,4 +65,7 @@ class MainMenu:
         self.play_button.draw(self.game.screen)
         self.leaderboard_button.draw(self.game.screen)
         self.close_button.draw(self.game.screen)
+
+        if self.game.speakers:
+            self.mute_button.draw(self.game.screen)
 

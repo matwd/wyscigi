@@ -16,7 +16,8 @@ class CountdownScreen:
     def update(self, events):
         current_time = pygame.time.get_ticks()
         if current_time - self.last_frame_time > 1000:
-            self.time-=1
+            # Co sekundę zmieniamy wyświetlaną cyfrę. Jeśli czas miałby zmienić się na 0, rozpoczynamy wyścig
+            self.time -= 1
             if self.time == 0:
                 self.game.start_race()
                 self.time = 4
@@ -26,6 +27,7 @@ class CountdownScreen:
 
 
     def draw(self):
+        # Rysowanie mapy, samochodów oraz naszego odliczania
         self.game.draw_everything()
         if self.time != 4:
             self.game.screen.blit(self.time_text, self.time_text_rect)

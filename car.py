@@ -30,6 +30,10 @@ class Car:
         self.drift = pygame.mixer.Sound("assets/sfx/drift.mp3")
         self.drift2 = pygame.mixer.Sound("assets/sfx/drift.mp3")
 
+        self.enginerunning3 = pygame.mixer.Sound("assets/sfx/enginerunning3.mp3")
+
+        self.nitrosfx = pygame.mixer.Sound("assets/sfx/nitro.mp3")
+
     # getter i setter dla kierunku
     # tak jak w grach retro samochód może być oburcony w ograniczoną ilość kierunków
     # u nas jest to 16 kierunków
@@ -219,7 +223,7 @@ class PlayerCar(Car):
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             self.turn_left()
 
-            if self.velocity.length() > 12 and self.game.sound:
+            if self.velocity.length() > 11 and self.game.sound and not self.drift.get_num_channels():
                 self.drift.play()
         else:
             if self.game.sound:
@@ -229,7 +233,7 @@ class PlayerCar(Car):
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.turn_right()
 
-            if self.velocity.length() > 12 and self.game.sound:
+            if self.velocity.length() > 11 and self.game.sound and not self.drift2.get_num_channels():
                 self.drift2.play()
         else:
             if self.game.sound:
@@ -238,6 +242,8 @@ class PlayerCar(Car):
         # klawisze: strzałka do przodu lub W
         if keys[pygame.K_UP] or keys[pygame.K_w]:
             self.accelerate(1)
+            if self.velocity.length() > 3 and not self.enginerunning3.get_num_channels() and self.game.sound:
+                self.enginerunning3.play()
         # jazda do tyłu
         # klawisze: strzałka do tyłu lub S
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
@@ -245,9 +251,15 @@ class PlayerCar(Car):
         # przyspieszenie nitro
         # klawisze: spacja
         if keys[pygame.K_SPACE]:
+            
             if self.nitro >= 10:
+                if not self.nitrosfx.get_num_channels() and self.game.sound:
+                    self.nitrosfx.play()
                 self.nitro -= 5
                 self.accelerate(3)
+            else:
+                if self.game.sound:
+                    self.nitrosfx.fadeout(400)
         # Zostawienie przeszkody na torze (jeżeli dostępna)
         # klawisze: E
         if keys[pygame.K_e]:

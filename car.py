@@ -470,8 +470,8 @@ class EnemyCar4(EnemyCar2):
 
         player_dist = (self.position - player.position).length()
         target_dist = (self.position - target).length()
-        # jeżeli blisko gracza
-        if player_dist < 250 and player.velocity.length() > 3:
+        # jeżeli blisko gracza i nie jest to ostatnie okrążenie gracza
+        if player_dist < 250 and player.velocity.length() > 3 and player.okrazenie != 2:
             EnemyCar.update(self)
             # jeżeli bardziej przed graczem to ustaw się centralnie przed graczem
             if target_dist < player_dist:

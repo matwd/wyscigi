@@ -39,14 +39,17 @@ class Game:
         pygame.font.init()
 
         # Inicjalizacja dźwięku
+        # sound - czy dźwięk jest włączony
+        # speakers - czy głośniki są dostępne
         self.sound = True
-        # self.sound = False
+        self.speakers = True
         try:
             pygame.mixer.init()
         except pygame.error:
             # jeżeli nie znaleziono głośnika to wyłączamy dźwięk
             print("brak wyjścia audio")
             self.sound = False
+            self.speakers = False
 
         # ustawienie ikony okna
         icon = pygame.image.load('assets/logo.ico') 

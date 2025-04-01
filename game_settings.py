@@ -47,11 +47,11 @@ class GameSettings:
         self.car_pick_text = self.font_large.render("CHOOSE YOUR CAR", True, (255,255,255))
         self.car_pick_rect = self.car_pick_text.get_rect(center=(960, 100))
 
-        self.car_1_btn = Button(pos=(320,470),text_var="Orange Overtaker", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
-        self.car_2_btn = Button(pos=(640,470),text_var="Cobalt Crusher", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
-        self.car_3_btn = Button(pos=(960,470),text_var="Crimson Conqueror", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
-        self.car_4_btn = Button(pos=(1280,470),text_var="Verdant Vandal", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
-        self.car_5_btn = Button(pos=(1600,470),text_var="Graphite Gladiator", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
+        self.car_1_btn = Button(self.game, (320,470),"Orange Overtaker", self.font_normal, (255,255,255),(86,86,86), self.game.real_screen)
+        self.car_2_btn = Button(self.game, (640,470), "Cobalt Crusher", self.font_normal, (255,255,255), (86,86,86), self.game.real_screen)
+        self.car_3_btn = Button(self.game, (960,470), "Crimson Conqueror", self.font_normal, (255,255,255), (86,86,86), self.game.real_screen)
+        self.car_4_btn = Button(self.game, (1280,470), "Verdant Vandal", self.font_normal, (255,255,255), (86,86,86), self.game.real_screen)
+        self.car_5_btn = Button(self.game, (1600,470), "Graphite Gladiator", self.font_normal, (255,255,255), (86,86,86), self.game.real_screen)
 
         self.car_btns = [self.car_1_btn,self.car_2_btn,self.car_3_btn,self.car_4_btn,self.car_5_btn]
 
@@ -63,9 +63,9 @@ class GameSettings:
         self.map_pick_rect = self.map_pick_text.get_rect(center=(960, 550))
 
 
-        self.map_1_btn = Button(pos=(380,875),text_var="Countryside Circuit", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
-        self.map_2_btn = Button(pos=(960,875),text_var="Petrol City", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
-        self.map_3_btn = Button(pos=(1540,875),text_var="Snowy Slipstream", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
+        self.map_1_btn = Button(self.game, pos=(380,875),text_var="Countryside Circuit", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
+        self.map_2_btn = Button(self.game, pos=(960,875),text_var="Petrol City", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
+        self.map_3_btn = Button(self.game, pos=(1540,875),text_var="Snowy Slipstream", font=self.font_normal, text_color=(255,255,255),hover_color=(86,86,86),real_screen=self.game.real_screen)
 
         self.chosen_map = 1
 
@@ -73,7 +73,7 @@ class GameSettings:
 
         # Przycisk do rozpoczęcia gry z wybranym pojazdem oraz mapą
 
-        self.play_button = Button(pos=(960, 955), text_var="START THE RACE", font=self.font_large, text_color=(255,255,255),
+        self.play_button = Button(self.game, pos=(960, 955), text_var="START THE RACE", font=self.font_large, text_color=(255,255,255),
                                   hover_color=(86,86,86),real_screen=self.game.real_screen)
 
 
@@ -109,8 +109,6 @@ class GameSettings:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # Rozpoczęcie gry wraz z wybranymi ustawieniami po kliknięciu przycisku 
                 if self.play_button.checkForInput(mouse_pos):
-                    if self.game.sound:
-                        pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
                     print("Wybrane auto:",self.chosen_car)
                     print("Wybrana mapa:",self.chosen_map)
                     self.game.selected_map = self.chosen_map - 1
@@ -120,8 +118,6 @@ class GameSettings:
                 for index, car_btn in enumerate(self.car_btns,start=1):
                     if car_btn.checkForInput(mouse_pos):
                         if self.chosen_car!=index:
-                            if self.game.sound:
-                                pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
                             self.chosen_car=index
                             self.car_frame_index = 6
                             self.last_frame_time = pygame.time.get_ticks()
@@ -146,8 +142,6 @@ class GameSettings:
                 for index, map_btn in enumerate(self.map_btns,start=1):
                     if map_btn.checkForInput(mouse_pos):
                         if self.chosen_map != index:
-                            if self.game.sound:
-                                    pygame.mixer.Sound("assets/sfx/clickmenu.mp3").play()
                             self.chosen_map=index
 
                 # Zmiana wybranej mapy po kliknięciu na obrazek

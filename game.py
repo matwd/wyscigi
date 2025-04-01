@@ -179,6 +179,7 @@ class Game:
         self.state = GameState.starting_countdown
         self.selected_map = map
         self.map.load_from_directory(f"assets/maps/map-{map:02}", map)
+        self.map.crate = None
 
         self.change_music(self.map.music)
 

@@ -22,6 +22,8 @@ class Button():
         self.hide = False
 
         self.text = self.font.render(self.text_var, True, self.text_color)
+
+        # cords to zmienna określająca stosunek położenia buttona do przekazananej pozycji
         if cords == Cords.center:
             self.rect = self.text.get_rect(center=(self.x,self.y))
         elif cords == Cords.topleft:
@@ -33,7 +35,6 @@ class Button():
         self.rect.bottom = self.rect.bottom - (self.rect.bottom - self.rect.top) / 2
 
     def draw(self, screen: pygame.surface.Surface) -> None:
-        # pygame.draw.rect(screen, (255, 0, 0), self.rect)
         screen.blit(self.text, self.rect)
         
     def checkForInput(self, position: tuple[int, int]) -> bool:
